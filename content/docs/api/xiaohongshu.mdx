@@ -1,0 +1,149 @@
+---
+title: "RedNote / Xiaohongshu Video Downloader API"
+description: "Use EasyDown's RedNote / Xiaohongshu video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+xhslink.com and xhslink.cn share URLs are resolved before the note workflow runs. EasyDown maps content media only and avoids mixing author avatars into the downloadable image list.
+
+Use it for both RedNote downloader and Xiaohongshu video downloader integrations, including supported short links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/xiaohongshu/parse`
+
+## Supported URL formats
+
+- `xiaohongshu.com/explore/{id}`
+- `xiaohongshu.com/discovery/item/{id}`
+- `rednote.com/explore/{id}`
+- `xhslink.com/{path}`
+- `xhslink.cn/{path}`
+
+### Accepted examples
+
+- `https://www.xiaohongshu.com/discovery/item/67f75b07000000000b0154b3`
+- `https://www.xiaohongshu.com/explore/671e2c6500000000210016b9`
+- `https://www.rednote.com/explore/6a51ee42000000001702879f`
+- `http://xhslink.com/o/2CxGwu8nSPx`
+
+## What the platform response contains
+
+Image notes return every available content image and first-frame candidate. Video notes return mapped videos plus related content images while keeping source order.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for RedNote / Xiaohongshu; currently `1`. |
+| `data.platformData.note_id` | `string` | Xiaohongshu note identifier. |
+| `data.platformData.title` | `string` | Public note title. |
+| `data.platformData.desc` | `string` | Public note description. |
+| `data.platformData.type` | `string` | Note media type. |
+| `data.platformData.user` | `object` | Public author profile fields. |
+| `data.platformData.images_list` | `array` | All image and live-photo items in the note. |
+| `data.platformData.video_info_v2` | `object` | Video stream, codec, cover, and dimension metadata. |
+| `data.platformData.interact_info` | `object` | Public engagement counters. |
+| `data.platformData.native_voice_info` | `object` | Native voice track metadata when present. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "xiaohongshu",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "note_id": "67f75b07000000000b0154b3",
+      "title": "Example public RedNote post",
+      "desc": "Example note description",
+      "type": "video",
+      "user": {
+        "user_id": "creator-id",
+        "nickname": "Example creator"
+      },
+      "images_list": [
+        {
+          "width": 1080,
+          "height": 1440,
+          "url": "https://media.example/image.jpg"
+        }
+      ],
+      "interact_info": {
+        "liked_count": "120",
+        "collected_count": "24"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use Referer: https://www.xiaohongshu.com/ and a browser User-Agent from your backend. Image and video CDNs can enforce anti-hotlinking, cookies, expiring URLs, and regional access.
+
+## Limits and behavior
+
+Profiles, search pages, collections, private notes, deleted notes, login-only media, and region-unavailable content are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Keep the full note URL when it contains access parameters required by the public page.
+- Proxy media instead of requesting Xiaohongshu CDNs directly from a browser.
+- Re-parse short or expired media URLs before retrying a download.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/xiaohongshu/parse" />

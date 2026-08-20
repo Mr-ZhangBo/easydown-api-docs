@@ -1,0 +1,42 @@
+---
+title: "通用社交媒体视频下载 API"
+description: "通过 POST /api/v1/parse 将任意已支持的社交媒体链接转换为统一的视频、图片和音频响应。"
+---
+
+通用接口保持精简兼容结构：`data` 本身就是统一媒体对象，不包含 `platformData`。
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+## 响应
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "公开作品示例",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/parse" />

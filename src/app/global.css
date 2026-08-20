@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
+
+:root {
+  --fd-primary: hsl(174 68% 32%);
+  --fd-ring: hsl(174 68% 32%);
+  --color-fd-muted-foreground: hsl(0 0% 36%);
+}
+
+.dark {
+  --fd-primary: hsl(166 72% 64%);
+  --fd-ring: hsl(166 72% 64%);
+  --color-fd-muted-foreground: hsl(0 0% 72%);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+#nd-docs-layout > main,
+#nd-page,
+#nd-page .prose {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#nd-page .prose :not(pre) > code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+body,
+code,
+pre,
+button,
+input,
+textarea {
+  letter-spacing: 0;
+}
+
+.api-method {
+  color: hsl(174 68% 27%);
+}
+
+.dark .api-method {
+  color: hsl(166 72% 64%);
+}

@@ -1,0 +1,51 @@
+---
+title: "SNS動画ダウンロードAPI"
+description: "TikTok、YouTube、Instagram、X、RedNote、Bilibili、Douyin、Threads、Kuaishou、Weibo、Toutiaoに対応した開発者向け動画ダウンロードAPIドキュメントです。"
+---
+
+11のプラットフォームを1つのSNS動画ダウンロードAPIで統合できます。共通APIは正規化されたメディアを返し、プラットフォーム別APIは機密項目を除去した完全データも返します。
+
+<Cards>
+  <Card title="動画ダウンロードAPIクイックスタート" href="/ja/quick-start" description="POST /api/v1/parse" />
+  <Card title="対応動画URL形式" href="/ja/supported-links" description="11プラットフォームのURL形式" />
+  <Card title="共通SNS動画ダウンロードAPI" href="/ja/api/common" description="1つの正規化レスポンス" />
+  <Card title="プラットフォーム別動画ダウンロードAPI" href="/ja/api" description="メディアと完全データ" />
+</Cards>
+
+## APIレスポンスの選び方
+
+| API | 適した用途 |
+|---|---|
+| [`POST /api/v1/parse`](/ja/api/common) | すべての対応プラットフォームを1つの安定したメディア形式で扱う場合。 |
+| `POST /api/v1/platforms/{platform}/parse` | 正規化メディアに加えて、機密項目を除去した完全なプラットフォームデータが必要な場合。 |
+
+## 対応プラットフォーム
+
+各ページで、対応URL、完全データのレスポンス、制限、エラー、最新のリクエストスキーマを確認できます。
+
+- [TikTok 動画ダウンロード API](/ja/api/tiktok)
+- [Douyin 動画ダウンロード API](/ja/api/douyin)
+- [Toutiao 動画ダウンロード API](/ja/api/toutiao)
+- [YouTube 動画ダウンロード API](/ja/api/youtube)
+- [Twitter / X 動画ダウンロード API](/ja/api/twitter)
+- [Instagram 動画・画像ダウンロード API](/ja/api/instagram)
+- [Threads 動画・画像ダウンロード API](/ja/api/threads)
+- [Xiaohongshu / RedNote 動画・画像ダウンロード API](/ja/api/xiaohongshu)
+- [Bilibili 動画ダウンロード API](/ja/api/bilibili)
+- [Kuaishou / Kwai 動画ダウンロード API](/ja/api/kuaishou)
+- [Weibo 動画・画像ダウンロード API](/ja/api/weibo)
+
+## ダウンロード可能なメディア
+
+成功レスポンスには動画、画像、音声が含まれます。外部サービスの項目が変わっても、正規化メディア形式によりクライアント実装を安定させられます。
+
+## エンドポイント
+
+- `POST https://api.easydown.org/api/v1/parse`
+- `POST https://api.easydown.org/api/v1/platforms/{platform}/parse`
+- `GET https://api.easydown.org/api/v1/capabilities`
+- `GET https://api.easydown.org/openapi.json`
+
+## API料金とCredits
+
+ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。認証、入力検証、権限、コンテンツ利用不可、メディアなし、外部サービス障害は課金されません。

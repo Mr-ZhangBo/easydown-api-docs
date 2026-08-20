@@ -1,0 +1,42 @@
+---
+title: "Unified Social Media Video Downloader API"
+description: "Parse any supported social media URL into one normalized video, image, and audio response with POST /api/v1/parse."
+---
+
+The common endpoint preserves the compact contract: `data` is the normalized media object itself and does not include `platformData`.
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+## Response
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "Example public post",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/parse" />

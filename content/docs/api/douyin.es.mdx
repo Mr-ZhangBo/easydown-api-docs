@@ -1,0 +1,148 @@
+---
+title: "API de descarga de videos de Douyin"
+description: "Usa la API de Douyin con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una URL pública de video, foto o nota de Douyin, incluida una URL compartida compatible. La API conserva todas las variantes y elementos disponibles.
+
+Úsala como backend para descargar videos de Douyin a partir de publicaciones públicas y enlaces compartidos compatibles.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/douyin/parse`
+
+## Formatos de URL compatibles
+
+- `douyin.com/video/{id}`
+- `douyin.com/note/{id}`
+- `douyin.com/shipin/{id}`
+- `v.douyin.com/{code}`
+
+### Ejemplos aceptados
+
+- `https://v.douyin.com/f-QpBB_oD9Y/`
+- `https://www.douyin.com/video/7641191614632071546`
+- `https://www.douyin.com/note/7643104807914401929`
+- `https://www.douyin.com/shipin/7643609848361355302`
+
+## Contenido de la respuesta de la plataforma
+
+Puede devolver video, imágenes, audio, portadas y variantes de la CDN que estén disponibles para la publicación.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de Douyin; actualmente `1`. |
+| `data.platformData.aweme_id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.desc` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.author` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.video` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.images` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.music` | `object` | Información pública de música, sonido original o pistas de audio independientes. |
+| `data.platformData.statistics` | `object` | Métricas públicas de reproducciones, Me gusta, comentarios, guardados o compartidos. |
+| `data.platformData.media_url` | `string` | URL pública de un archivo, portada o página de detalle devuelta por la plataforma. |
+| `data.platformData.media_type` | `string` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "douyin",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7641191614632071546",
+      "desc": "Example public Douyin work",
+      "author": {
+        "uid": "creator-id",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 15000,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "music": {
+        "title": "Original audio"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con Referer de Douyin, User-Agent y Range. Algunas URL dependen de la región, cookies o firmas temporales.
+
+## Límites y comportamiento
+
+No admite perfiles, búsquedas, colecciones, páginas de seguimiento, directos, publicaciones privadas ni enlaces compartidos caducados.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Resuelve el enlace compartido antes de guardar el aweme_id o la URL final.
+- Comprueba videos[], images[] y audios[] porque el tipo de publicación cambia la respuesta.
+- Vuelve a analizar si una URL firmada caduca o la región del backend no puede acceder al contenido.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/douyin/parse" />

@@ -1,0 +1,18 @@
+---
+title: "视频下载 MCP 服务"
+description: "使用同一套 Token、平台权限和计费规则，将 EasyDown 视频下载能力接入 MCP 客户端。"
+---
+
+EasyDown 在 `https://api.easydown.org/mcp` 提供视频下载 MCP 服务。
+
+## API 鉴权
+
+请在 Authorization 请求头中发送 Token。不要把生产 Token 写入 URL、客户端日志、源码仓库或分析事件。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 限制与行为
+
+- 将 Token 保存在 MCP 客户端的安全密钥存储中。
+- 不要把 Token 写入提示词、工具参数、URL 或共享配置文件。
+- REST API 与 MCP 使用同一套“成功返回媒体才扣费”规则。

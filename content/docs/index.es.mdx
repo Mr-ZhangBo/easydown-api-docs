@@ -1,0 +1,51 @@
+---
+title: "API para descargar videos de redes sociales"
+description: "Documentación para desarrolladores de una API compatible con TikTok, YouTube, Instagram, X, RedNote, Bilibili, Douyin, Threads, Kuaishou, Weibo y Toutiao."
+---
+
+Integra 11 plataformas con una sola API para descargar videos de redes sociales. La API común normaliza los medios y cada API específica añade los datos completos de la plataforma después de eliminar campos sensibles.
+
+<Cards>
+  <Card title="Inicio rápido de la API de descarga" href="/es/quick-start" description="POST /api/v1/parse" />
+  <Card title="Formatos de URL de video compatibles" href="/es/supported-links" description="11 plataformas y formatos URL" />
+  <Card title="API unificada para descargar videos de redes sociales" href="/es/api/common" description="Una respuesta multimedia normalizada" />
+  <Card title="API para descargar videos por plataforma" href="/es/api" description="Medios y datos completos" />
+</Cards>
+
+## Elige el tipo de respuesta
+
+| API | Úsala cuando |
+|---|---|
+| [`POST /api/v1/parse`](/es/api/common) | Necesitas un modelo multimedia estable para todas las plataformas compatibles. |
+| `POST /api/v1/platforms/{platform}/parse` | Necesitas medios normalizados y el objeto completo de la plataforma, sin campos sensibles. |
+
+## Plataformas compatibles
+
+Cada página explica las URL aceptadas, la respuesta completa, los límites, los errores y el esquema de solicitud actualizado.
+
+- [API de descarga de videos de TikTok](/es/api/tiktok)
+- [API de descarga de videos de Douyin](/es/api/douyin)
+- [API de descarga de videos de Toutiao](/es/api/toutiao)
+- [API de descarga de videos de YouTube](/es/api/youtube)
+- [API de descarga de videos de Twitter / X](/es/api/twitter)
+- [API de descarga de videos de Instagram](/es/api/instagram)
+- [API de descarga de videos de Threads](/es/api/threads)
+- [API de descarga de videos de Xiaohongshu / RedNote](/es/api/xiaohongshu)
+- [API de descarga de videos de Bilibili](/es/api/bilibili)
+- [API de descarga de videos de Kuaishou / Kwai](/es/api/kuaishou)
+- [API de descarga de videos de Weibo](/es/api/weibo)
+
+## Medios descargables
+
+Las respuestas correctas pueden incluir videos, imágenes o audio. El modelo normalizado mantiene estable el código cliente aunque cambien los campos de la plataforma.
+
+## Endpoints
+
+- `POST https://api.easydown.org/api/v1/parse`
+- `POST https://api.easydown.org/api/v1/platforms/{platform}/parse`
+- `GET https://api.easydown.org/api/v1/capabilities`
+- `GET https://api.easydown.org/openapi.json`
+
+## Créditos y facturación de la API
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.

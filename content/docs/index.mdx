@@ -1,0 +1,51 @@
+---
+title: "Social Media Video Downloader API"
+description: "Developer docs for one video downloader API across TikTok, YouTube, Instagram, X, RedNote, Bilibili, Douyin, Threads, Kuaishou, Weibo, and Toutiao."
+---
+
+Build one social media video downloader integration for 11 platforms. Use the common API for normalized media or a platform endpoint for downloadable media plus the complete sanitized platform data object.
+
+<Cards>
+  <Card title="Video Downloader API quick start" href="/en/quick-start" description="POST /api/v1/parse" />
+  <Card title="Supported video URL formats" href="/en/supported-links" description="11 platforms and URL patterns" />
+  <Card title="Unified Social Media Video Downloader API" href="/en/api/common" description="One normalized media response" />
+  <Card title="Platform video downloader APIs" href="/en/api" description="Media plus full platform data" />
+</Cards>
+
+## Choose an API response
+
+| API | Use it when |
+|---|---|
+| [`POST /api/v1/parse`](/en/api/common) | You need one stable media model across every supported platform. |
+| `POST /api/v1/platforms/{platform}/parse` | You need normalized media and the final sanitized platform data object. |
+
+## Supported platforms
+
+Each platform page documents its accepted links, full-data response, limits, errors, and live request schema.
+
+- [TikTok Video Downloader API](/en/api/tiktok)
+- [Douyin Video Downloader API](/en/api/douyin)
+- [Toutiao Video Downloader API](/en/api/toutiao)
+- [YouTube Video Downloader API](/en/api/youtube)
+- [Twitter / X Video Downloader API](/en/api/twitter)
+- [Instagram Video Downloader API](/en/api/instagram)
+- [Threads Video Downloader API](/en/api/threads)
+- [RedNote / Xiaohongshu Video Downloader API](/en/api/xiaohongshu)
+- [Bilibili Video Downloader API](/en/api/bilibili)
+- [Kuaishou / Kwai Video Downloader API](/en/api/kuaishou)
+- [Weibo Video Downloader API](/en/api/weibo)
+
+## Downloadable media
+
+Successful responses can contain video, image, or audio files. The normalized media model keeps client code stable even when upstream platform fields change.
+
+## Endpoints
+
+- `POST https://api.easydown.org/api/v1/parse`
+- `POST https://api.easydown.org/api/v1/platforms/{platform}/parse`
+- `GET https://api.easydown.org/api/v1/capabilities`
+- `GET https://api.easydown.org/openapi.json`
+
+## API credits and billing
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.

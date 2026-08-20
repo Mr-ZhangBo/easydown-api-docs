@@ -1,0 +1,17 @@
+---
+title: "API authentication"
+description: "Authenticate EasyDown video downloader API requests with a Bearer token and keep production credentials secure."
+---
+
+Send the token in the Authorization header. Never place production tokens in URLs, client logs, source control, or analytics.
+
+```http
+Authorization: Bearer ed_live_your_token
+```
+
+## Limits and behavior
+
+- Tokens can be restricted to selected platforms.
+- Missing, expired, revoked, or invalid tokens return an authentication error and consume 0 credits.
+- Platform permission failures return `platform_not_allowed` and consume 0 credits.
+- Browser requests support CORS, but production tokens should normally stay on your server.

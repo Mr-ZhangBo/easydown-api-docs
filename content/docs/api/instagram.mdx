@@ -1,0 +1,153 @@
+---
+title: "Instagram Video Downloader API"
+description: "Use EasyDown's Instagram video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+One REST request supports post, Reel, embed, and share URLs. Carousel order is preserved so integrations can display or store the complete public post instead of only the first item.
+
+Use it to add Instagram video download support for public posts, reels, and compatible shared links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/instagram/parse`
+
+## Supported URL formats
+
+- `instagram.com/reel/{id}`
+- `instagram.com/p/{id}`
+- `instagram.com/stories/{user}/{id}`
+- `instagram.com/share/{type}/{code}`
+
+### Accepted examples
+
+- `https://www.instagram.com/reel/DY2PcmxiBE2/`
+- `https://www.instagram.com/p/DYJIhddkzi0/`
+- `https://www.instagram.com/stories/wordongreene/3940061275140997661`
+- `https://www.instagram.com/share/reel/BAabcdef123/`
+
+## What the platform response contains
+
+The response can contain both images[] and videos[] for mixed or carousel posts. Available cover and thumbnail candidates remain separate from downloadable post media.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Instagram; currently `1`. |
+| `data.platformData.id` | `string` | Instagram media identifier. |
+| `data.platformData.code` | `string` | Public post or Reel shortcode. |
+| `data.platformData.caption` | `object` | Public caption fields when available. |
+| `data.platformData.user` | `object` | Public author profile fields. |
+| `data.platformData.video_versions` | `array` | Playable video renditions for a video item. |
+| `data.platformData.image_versions` | `object` | Image candidates for a photo or cover. |
+| `data.platformData.carousel_media` | `array` | All media items in a public carousel. |
+| `data.platformData.taken_at` | `number` | Publication timestamp when exposed. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "instagram",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "example-media-id",
+      "code": "DY2PcmxiBE2",
+      "caption": {
+        "text": "Example public Instagram post"
+      },
+      "user": {
+        "username": "creator",
+        "full_name": "Example creator"
+      },
+      "video_versions": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "url": "https://media.example/video.mp4"
+        }
+      ],
+      "image_versions": {
+        "candidates": [
+          {
+            "width": 1080,
+            "height": 1920,
+            "url": "https://media.example/cover.jpg"
+          }
+        ]
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use a backend request with Referer: https://www.instagram.com/ and a browser User-Agent. Direct browser previews can fail because Instagram CDNs enforce CORS, CORP, cookies, or expiring signatures.
+
+## Limits and behavior
+
+Profiles, Highlights, Explore pages, direct messages, private posts, login-only media, and expired Stories are not supported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Use the full public post or Reel URL rather than an account profile.
+- Proxy CDN media through your backend when the browser reports CORS or CORP.
+- Re-parse the post after an Instagram CDN URL expires.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/instagram/parse" />

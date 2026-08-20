@@ -1,0 +1,25 @@
+---
+title: "Video downloader API error codes"
+description: "Map stable EasyDown errors for unsupported URLs, unavailable content, no media, platform mismatch, and upstream failures."
+---
+
+| Field | Description |
+|---|---|
+| `platform_mismatch` | URL belongs to another platform endpoint |
+| `unsupported_url` | URL shape is not accepted |
+| `content_unavailable` | Post is private, deleted, restricted, or unavailable |
+| `no_media` | No downloadable media was found |
+| `upstream_unavailable` | Platform service is temporarily unavailable |
+
+## Response
+
+```json
+{
+  "status": 404,
+  "data": null,
+  "msg": "The content is unavailable",
+  "code": "content_unavailable"
+}
+```
+
+EasyDown never returns provider names, provider request IDs, provider endpoints, billing hints, credentials, traces, or raw provider error text.

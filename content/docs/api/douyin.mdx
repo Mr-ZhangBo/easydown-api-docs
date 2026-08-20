@@ -1,0 +1,148 @@
+---
+title: "Douyin Video Downloader API"
+description: "Use EasyDown's Douyin video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+EasyDown keeps the work ID as a string, resolves share URLs when required, and returns the same REST response shape for Douyin video and photo-note content.
+
+Use it to build a Douyin video downloader backend for supported public video and image posts.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/douyin/parse`
+
+## Supported URL formats
+
+- `douyin.com/video/{id}`
+- `douyin.com/note/{id}`
+- `douyin.com/shipin/{id}`
+- `v.douyin.com/{code}`
+
+### Accepted examples
+
+- `https://v.douyin.com/f-QpBB_oD9Y/`
+- `https://www.douyin.com/video/7641191614632071546`
+- `https://www.douyin.com/note/7643104807914401929`
+- `https://www.douyin.com/shipin/7643609848361355302`
+
+## What the platform response contains
+
+The response can include mapped video qualities, audio, covers, and note images. Supported direct-media URLs avoid an unnecessary upstream post lookup.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Douyin; currently `1`. |
+| `data.platformData.aweme_id` | `string` | Douyin work identifier. |
+| `data.platformData.desc` | `string` | Public work caption. |
+| `data.platformData.author` | `object` | Public creator profile fields. |
+| `data.platformData.video` | `object` | Video metadata and playable renditions. |
+| `data.platformData.images` | `array` | Image-note items when the work is a gallery. |
+| `data.platformData.music` | `object` | Public soundtrack metadata and playable audio fields. |
+| `data.platformData.statistics` | `object` | Public engagement counters exposed for the work. |
+| `data.platformData.media_url` | `string` | Accepted direct media URL when direct-media parsing is used. |
+| `data.platformData.media_type` | `string` | Direct-media response kind when direct-media parsing is used. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "douyin",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7641191614632071546",
+      "desc": "Example public Douyin work",
+      "author": {
+        "uid": "creator-id",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 15000,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "music": {
+        "title": "Original audio"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use Referer: https://www.douyin.com/, a browser User-Agent, and forwarded Range headers from a backend proxy. Douyin media signatures are short lived and may require a region with public access.
+
+## Limits and behavior
+
+Profiles without a work ID, search results, follow pages, collections, live pages, private content, deleted works, and region-unavailable media are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Resolve v.douyin.com share links before storing a canonical work URL.
+- Forward Range for large video responses.
+- Re-parse immediately after a signed URL returns 403 or 404.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/douyin/parse" />

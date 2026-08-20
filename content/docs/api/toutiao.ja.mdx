@@ -1,0 +1,134 @@
+---
+title: "Toutiao 動画ダウンロード API"
+description: "Toutiao（今日頭条）の対応する公開URLを解析し、ダウンロード可能な動画・画像・音声と、機密項目を除去したプラットフォームデータを取得します。URL形式、レスポンス項目、エラー、実装例を掲載しています。"
+---
+
+数字に見える group ID を REST フロー全体で文字列として保持し、動画検索前の精度損失を防ぎます。
+
+対応する記事URLや動画URLを処理するToutiao動画ダウンロードAPIが必要な場合に適しています。
+
+安定したダウンロードメディアに加えてプラットフォーム固有項目が必要な場合に使用します。
+
+## エンドポイント
+
+`POST https://api.easydown.org/api/v1/platforms/toutiao/parse`
+
+## 対応URL形式
+
+- `toutiao.com/video/{id}`
+
+### 利用可能な例
+
+- `https://www.toutiao.com/video/7613611314560369152/`
+- `https://www.toutiao.com/video/7501991960077500979/`
+
+## このプラットフォームのレスポンス内容
+
+video_list 各項目の main・backup URL を返し、first frame、カバー、コンテンツ画像はプレビュー用に images[] に保持します。
+
+## 公開済みプラットフォームデータ項目
+
+対象投稿の最終レスポンスに含まれるその他の公開項目も、機密情報を再帰的に除去したうえで保持します。以下の項目は現在の platformDataVersion 内で安定しています。
+
+| 項目 | 型 | 説明 |
+|---|---|---|
+| `data.media` | `object` | 正規化された画像、動画、音声、タイトル、サムネイル、再生時間。 |
+| `data.platformDataVersion` | `string` | Toutiao（今日頭条）の公開データ契約バージョン。現在は`1`です。 |
+| `data.platformData.group_id` | `string` | 対象投稿の公開識別子です。大きな数値の精度を失わないよう文字列として保存します。 |
+| `data.platformData.item_id` | `string` | 対象投稿の公開識別子です。大きな数値の精度を失わないよう文字列として保存します。 |
+| `data.platformData.title` | `string` | 対象投稿に公開表示されるタイトル、本文、説明です。 |
+| `data.platformData.abstract` | `string` | 対象投稿に公開表示されるタイトル、本文、説明です。 |
+| `data.platformData.poster_url` | `string` | プラットフォームが公開しているメディア、カバー、詳細ページのURLです。 |
+| `data.platformData.video_duration` | `number` | 再生時間、サイズ、画質などプラットフォーム由来の技術情報です。 |
+| `data.platformData.video_play_info` | `object` | 動画の再生候補、画質、コーデック、サイズ、メディアURLに関する情報です。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "toutiao",
+      "title": "公開投稿の例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "group_id": "7613611314560369152",
+      "item_id": "7613611314560369152",
+      "title": "Example public Toutiao video",
+      "poster_url": "https://media.example/poster.jpg",
+      "video_duration": 18,
+      "video_play_info": {
+        "video_list": {
+          "video_1": {
+            "main_url": "https://media.example/video.mp4"
+          }
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## ダウンロードとプロキシの注意点
+
+Toutiao Referer、ブラウザー User-Agent、Range を付け、選択した main・backup URL をバックエンドでストリーミングし、期限切れ後は再解析します。
+
+## 制限と動作
+
+記事、group、プロフィール、検索、チャンネル、短縮 URL、ライブ、非公開、単一動画 ID のない URL には対応しません。
+
+公開コンテンツのみ対象です。非公開、削除済み、年齢・地域制限、ライブ配信、その他利用できないコンテンツは解析に失敗する場合があります。失敗時にクレジットは消費されません。
+
+ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。認証、入力検証、権限、コンテンツ利用不可、メディアなし、外部サービス障害は課金されません。
+
+## トラブルシューティング
+
+- group ID は JavaScript とデータベースで文字列として保持します。
+- main ストリームが利用できない場合は backup URL を試します。
+- 記事や group ではなく `/video/{id}` ページを送信します。
+
+## よくある質問
+
+### 失敗したリクエストは課金されますか？
+
+いいえ。ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。
+
+### 正しい公開URLでも失敗するのはなぜですか？
+
+投稿が削除済み、非公開、地域制限、ライブ、メディアなし、または外部サービスが一時的に利用できない可能性があります。
+
+## 関連ガイド
+
+- [全プラットフォームAPI](/ja/api)
+- [共通の正規化API](/ja/api/common)
+- [対応する全URL形式](/ja/supported-links)
+- [エラーコード](/ja/errors)
+- [メディアのダウンロード](/ja/media-downloads)
+- [API認証](/ja/authentication)
+- [料金とクレジット](/ja/billing)
+
+## 対話型APIリファレンス
+
+以下のcurl、JavaScript、Pythonの例とスキーマは、本番環境のOpenAPI 3.1契約から生成されます。
+
+「Try it」パネルは`api.easydown.org`へ直接リクエストします。トークンはページのメモリだけに保持され、再読み込みすると消去されます。
+
+<ApiReference path="/api/v1/platforms/toutiao/parse" />

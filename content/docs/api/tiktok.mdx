@@ -1,0 +1,144 @@
+---
+title: "TikTok Video Downloader API"
+description: "Use EasyDown's TikTok video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Normal video pages, photo posts, and TikTok share redirects all use the same authenticated REST request. EasyDown normalizes the result without discarding alternate qualities or gallery items.
+
+Use it to add TikTok downloader and TikTok video download support without maintaining platform-specific extraction logic.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/tiktok/parse`
+
+## Supported URL formats
+
+- `tiktok.com/@{user}/video/{id}`
+- `tiktok.com/@{user}/photo/{id}`
+- `tiktok.com/t/{code}`
+
+### Accepted examples
+
+- `https://www.tiktok.com/@jesscreatescontent/video/7647557116596718861`
+- `https://www.tiktok.com/@creator/photo/7512345678901234567`
+- `https://www.tiktok.com/t/ZP8pT81pD/`
+
+## What the platform response contains
+
+Video posts may return several video qualities, cover images, and audio. Photo posts return every public gallery image exposed by the source response.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for TikTok; currently `1`. |
+| `data.platformData.aweme_id` | `string` | TikTok post identifier. |
+| `data.platformData.desc` | `string` | Public post caption. |
+| `data.platformData.author` | `object` | Public creator profile fields. |
+| `data.platformData.video` | `object` | Video metadata and playable renditions when the post is a video. |
+| `data.platformData.images` | `array` | Photo-post image objects when the post contains images. |
+| `data.platformData.statistics` | `object` | Public engagement counters exposed for the post. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "tiktok",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7647557116596718861",
+      "desc": "Example public TikTok post",
+      "author": {
+        "unique_id": "creator",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 12,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "statistics": {
+        "play_count": 1200,
+        "digg_count": 84
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use a backend proxy with Referer: https://www.tiktok.com/ and a browser User-Agent. Some media requires a valid access cookie from your own browsing context, and availability can vary by server region.
+
+## Limits and behavior
+
+Profiles, LIVE pages, sound pages, search results, TikTok Lite pages, private posts, deleted posts, and region-unavailable media are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Resolve short share URLs before caching their final post URL.
+- Re-parse when a media URL returns 403 or 404 because TikTok links can expire.
+- Do not expose API tokens or source cookies in browser JavaScript.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/tiktok/parse" />

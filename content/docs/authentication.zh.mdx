@@ -1,0 +1,17 @@
+---
+title: "API 鉴权"
+description: "使用 Bearer Token 调用 EasyDown 视频下载 API，并安全保护生产凭证。"
+---
+
+请在 Authorization 请求头中发送 Token。不要把生产 Token 写入 URL、客户端日志、源码仓库或分析事件。
+
+```http
+Authorization: Bearer ed_live_your_token
+```
+
+## 限制与行为
+
+- Token 可以限制为仅允许调用指定平台。
+- Token 缺失、过期、已吊销或无效时返回鉴权错误，不消耗额度。
+- 没有平台权限时返回 `platform_not_allowed`，不消耗额度。
+- 浏览器请求支持 CORS，但生产 Token 通常应保留在服务端。

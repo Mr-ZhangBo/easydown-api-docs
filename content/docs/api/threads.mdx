@@ -1,0 +1,160 @@
+---
+title: "Threads Video Downloader API"
+description: "Use EasyDown's Threads video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+EasyDown resolves Threads share redirects, decodes the requested shortcode locally to a precision-safe numeric post ID, and makes one detail request for the exact post.
+
+Use it to build a Threads video downloader for supported public post URLs without returning unrelated posts.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/threads/parse`
+
+## Supported URL formats
+
+- `threads.com/@{user}/post/{id}`
+- `threads.net/@{user}/post/{id}`
+- `threads.com/@{user}/post/{id}/media`
+- `threads.net/@{user}/post/{id}/media`
+- `threads.com/share/{code}`
+- `threads.net/share/{code}`
+- `Supported post and share links may include query parameters`
+
+### Accepted examples
+
+- `https://www.threads.com/@eekeai/post/DDhV3LWhrlk`
+- `https://www.threads.com/share/_5O7Rn7A0/`
+
+## What the platform response contains
+
+Media posts can return every valid video and image candidate from direct fields, carousels, and text_post_app_info.linked_inline_media. Duplicate upstream variants are preserved.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Threads; currently `1`. |
+| `data.platformData.id` | `string` | Threads post identifier. |
+| `data.platformData.code` | `string` | Public post shortcode. |
+| `data.platformData.text` | `string` | Public post text when exposed. |
+| `data.platformData.user` | `object` | Public author profile fields. |
+| `data.platformData.images` | `array` | Image items attached to the target post. |
+| `data.platformData.image_versions2` | `object` | Image and cover candidates attached directly to the target post. |
+| `data.platformData.video_versions` | `array` | Playable video renditions attached to the target post. |
+| `data.platformData.carousel_media` | `array` | All media items in a carousel post. |
+| `data.platformData.text_post_app_info` | `object` | Threads text-post metadata, including linked_inline_media when the post embeds downloadable media. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "threads",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "example-thread-id",
+      "code": "DDhV3LWhrlk",
+      "text": "Example public Threads post",
+      "user": {
+        "username": "creator"
+      },
+      "image_versions2": {
+        "candidates": []
+      },
+      "video_versions": [],
+      "text_post_app_info": {
+        "linked_inline_media": {
+          "code": "DaOF2fAtXRh",
+          "image_versions2": {
+            "candidates": [
+              {
+                "url": "https://media.example/cover.jpg",
+                "width": 540,
+                "height": 960
+              }
+            ]
+          },
+          "video_versions": [
+            {
+              "type": 101,
+              "url": "https://media.example/video.mp4"
+            }
+          ]
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use a backend proxy with a browser User-Agent and the matching Threads origin as Referer. Store returned media URLs only briefly because source signatures and variants can change.
+
+## Limits and behavior
+
+Text-only posts, profiles, feeds, replies, search results, private posts, and deleted posts return no downloadable media.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Use a threads.com or threads.net post URL, /media URL, or /share/ redirect link.
+- Treat text-only success responses as no-media results.
+- Read linked_inline_media as well as direct and carousel media.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/threads/parse" />

@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Documented EasyDown API token placeholders"
+regexes = [
+  '''ed_live_your_token''',
+]

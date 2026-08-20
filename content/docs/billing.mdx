@@ -1,0 +1,16 @@
+---
+title: "API credits and billing"
+description: "Understand the 1-credit success charge, free failed requests, balance headers, and cache behavior."
+---
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Response
+
+Successful commercial responses include:
+
+- `X-Credits-Charged: 1`
+- `X-Credits-Remaining: {balance}`
+- `X-EasyDown-Cache: HIT | MISS | SUPABASE | BYPASS`
+
+Cache hits still return media and therefore cost 1 credit. Failed responses never decrement the balance.

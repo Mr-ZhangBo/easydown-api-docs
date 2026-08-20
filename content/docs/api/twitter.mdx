@@ -1,0 +1,141 @@
+---
+title: "Twitter / X Video Downloader API"
+description: "Use EasyDown's Twitter / X video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Both x.com and twitter.com status links enter the same REST workflow. Large status IDs stay strings and all returned media variants are preserved for backend selection.
+
+Use it for X video downloader workflows or to download video from Twitter while accepting both x.com and twitter.com links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/twitter/parse`
+
+## Supported URL formats
+
+- `x.com/{user}/status/{id}`
+- `twitter.com/{user}/status/{id}`
+
+### Accepted examples
+
+- `https://x.com/i/status/2064933214720803143`
+- `https://x.com/Taozhishuishui/status/2041638397358260556/video/1`
+
+## What the platform response contains
+
+Video posts can return multiple bitrate and dimension variants. Image posts keep every post image; thumbnails are not substituted for full post media.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Twitter / X; currently `1`. |
+| `data.platformData.id_str` | `string` | Tweet or post identifier. |
+| `data.platformData.text` | `string` | Public post text when exposed. |
+| `data.platformData.full_text` | `string` | Expanded public post text when exposed. |
+| `data.platformData.user` | `object` | Public author profile fields. |
+| `data.platformData.media` | `object` | Video variants and image objects attached to the post. |
+| `data.platformData.metrics` | `object` | Public engagement counters when exposed. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "twitter",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id_str": "2064933214720803143",
+      "full_text": "Example public X post",
+      "user": {
+        "screen_name": "creator",
+        "name": "Example creator"
+      },
+      "media": {
+        "video": [
+          {
+            "variants": [
+              {
+                "content_type": "video/mp4",
+                "bitrate": 832000,
+                "url": "https://media.example/video.mp4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Fetch selected media from your backend with Referer: https://x.com/ and a browser User-Agent. Forward Range for large files and re-parse if a selected variant expires.
+
+## Limits and behavior
+
+Profiles, search pages, Spaces, Communities, Broadcast URLs, private posts, deleted posts, and direct CDN URLs are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Submit a status URL containing one post ID.
+- Choose a videos[] variant by quality and dimensions instead of array position alone.
+- Re-parse the original status when a media variant stops responding.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/twitter/parse" />

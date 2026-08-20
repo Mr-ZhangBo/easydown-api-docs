@@ -1,0 +1,16 @@
+---
+title: "API 计费与额度"
+description: "了解成功请求消耗 1 个额度（credit）、失败不扣费、余额响应头、缓存命中和剩余额度的计费规则。"
+---
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 响应
+
+商业 API 成功响应会包含：
+
+- `X-Credits-Charged: 1`
+- `X-Credits-Remaining: {balance}`
+- `X-EasyDown-Cache: HIT | MISS | SUPABASE | BYPASS`
+
+缓存命中仍然返回媒体，因此会消耗 1 个额度；任何失败响应都不会减少余额。

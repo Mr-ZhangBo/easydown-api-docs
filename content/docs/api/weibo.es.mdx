@@ -1,0 +1,149 @@
+---
+title: "API de descarga de videos de Weibo"
+description: "Usa la API de Weibo con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una URL de estado, detalle, visitante o t.cn de Weibo. La API conserva las calidades de video y todas las imágenes de la publicación solicitada.
+
+Úsala para crear una API de descarga de videos de Weibo para estados y URL públicas compatibles.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/weibo/parse`
+
+## Formatos de URL compatibles
+
+- `weibo.com/{user}/{id}`
+- `m.weibo.cn/status/{id}`
+- `m.weibo.cn/detail/{id}`
+- `weibo.com/tv/show/{id}`
+- `video.weibo.com/show?fid={id}`
+- `t.cn/{code}`
+
+### Ejemplos aceptados
+
+- `https://m.weibo.cn/status/5052484659707960`
+- `https://m.weibo.cn/detail/5320188317925845`
+- `https://weibo.com/1735344023/KlxqqfkYa`
+- `https://weibo.com/tv/show/1034:5302868002144396`
+
+## Contenido de la respuesta de la plataforma
+
+Puede devolver varias calidades de video, portadas, fotos individuales y todos los archivos de una galería.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de Weibo; actualmente `1`. |
+| `data.platformData.id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.mid` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.mblogid` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.text_raw` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.user` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.pics` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.page_info` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.video_details_url` | `string` | URL pública de un archivo, portada o página de detalle devuelta por la plataforma. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "weibo",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "5320188317925845",
+      "mid": "5320188317925845",
+      "text_raw": "Example public Weibo post",
+      "user": {
+        "screen_name": "Example creator"
+      },
+      "pics": [
+        {
+          "large": {
+            "url": "https://media.example/image.jpg"
+          }
+        }
+      ],
+      "page_info": {
+        "page_title": "Example video",
+        "media_info": {
+          "mp4_hd_url": "https://media.example/video.mp4"
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga siempre desde el backend con Referer de Weibo, User-Agent y Range. Vuelve a analizar cuando caduque la firma de una imagen o un video.
+
+## Límites y comportamiento
+
+No admite perfiles, temas, supertemas, directos, artículos, colecciones, publicaciones privadas o eliminadas ni enlaces caducados.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Resuelve las URL t.cn antes de guardar el identificador de la publicación.
+- Elige la reproducción por sus metadatos de calidad y no por el orden del array.
+- Vuelve a analizar después de que caduque la firma de una imagen o un video.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/weibo/parse" />

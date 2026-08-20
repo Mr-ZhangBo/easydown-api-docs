@@ -1,0 +1,17 @@
+---
+title: "Descargar medios de la respuesta de la API"
+description: "Usa correctamente las URL de video, imagen y audio, las cabeceras públicas, la calidad y la caducidad."
+---
+
+El objeto `media` contiene matrices separadas para `images`, `videos` y `audios`.
+
+## Campos de respuesta
+
+- `url`: URL pública o temporal del medio.
+- `quality`, `mimeType`, `width`, `height`, `bitrate`: datos para elegir una versión.
+- `source`: `direct`, `adaptive`, `dash`, `live_photo` o `native_voice`.
+- `headers`: cabeceras públicas que exige el host, como `Referer`.
+
+## Límites y comportamiento
+
+Las URL de descarga pueden caducar. Descarga el archivo poco después del análisis, sigue redirecciones, conserva la consulta completa y envía solo las cabeceras públicas devueltas. EasyDown no guarda los datos completos de la plataforma en Supabase.

@@ -1,0 +1,149 @@
+---
+title: "小红书 / RedNote 视频与图片下载 API"
+description: "使用 小红书 / RedNote 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+xhslink.com 与 xhslink.cn 分享短链会在进入笔记流程前解析完成；EasyDown 只映射作品媒体，不会把作者头像混入可下载图片列表。
+
+同时覆盖小红书视频下载和 RedNote 视频下载场景，并支持已列出的短链格式。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/xiaohongshu/parse`
+
+## 支持的 URL 格式
+
+- `xiaohongshu.com/explore/{id}`
+- `xiaohongshu.com/discovery/item/{id}`
+- `rednote.com/explore/{id}`
+- `xhslink.com/{path}`
+- `xhslink.cn/{path}`
+
+### 可用示例
+
+- `https://www.xiaohongshu.com/discovery/item/67f75b07000000000b0154b3`
+- `https://www.xiaohongshu.com/explore/671e2c6500000000210016b9`
+- `https://www.rednote.com/explore/6a51ee42000000001702879f`
+- `http://xhslink.com/o/2CxGwu8nSPx`
+
+## 该平台响应会返回什么
+
+图文笔记返回全部内容图片和首帧候选；视频笔记返回映射后的视频及相关作品图片，并保持源顺序。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | 小红书 / RedNote的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.note_id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.title` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.desc` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.type` | `string` | 目标作品在平台响应中的公开字段。 |
+| `data.platformData.user` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.images_list` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.video_info_v2` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.interact_info` | `object` | 平台公开展示的播放、点赞、评论、收藏或分享等互动统计。 |
+| `data.platformData.native_voice_info` | `object` | 目标作品的公开配乐、原声或独立音轨信息。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "xiaohongshu",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "note_id": "67f75b07000000000b0154b3",
+      "title": "Example public RedNote post",
+      "desc": "Example note description",
+      "type": "video",
+      "user": {
+        "user_id": "creator-id",
+        "nickname": "Example creator"
+      },
+      "images_list": [
+        {
+          "width": 1080,
+          "height": 1440,
+          "url": "https://media.example/image.jpg"
+        }
+      ],
+      "interact_info": {
+        "liked_count": "120",
+        "collected_count": "24"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+后端请求携带小红书 Referer 与浏览器 User-Agent。图片和视频 CDN 可能检查防盗链、Cookie、过期 URL 和地区访问。
+
+## 限制与行为
+
+不支持主页、搜索页、合集、私密笔记、已删除笔记、仅登录可见媒体和地区不可用内容。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 公开页面需要访问参数时，保留完整笔记 URL。
+- 通过后端代理媒体，不要让浏览器直接请求小红书 CDN。
+- 短链或媒体 URL 过期后重新解析再重试。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/xiaohongshu/parse" />

@@ -1,0 +1,42 @@
+---
+title: "共通SNS動画ダウンロードAPI"
+description: "POST /api/v1/parseで対応するSNS URLを正規化された動画・画像・音声レスポンスへ変換します。"
+---
+
+共通エンドポイントは既存の簡潔な契約を維持します。`data`自体が正規化メディアオブジェクトで、`platformData`は含まれません。
+
+以下のcurl、JavaScript、Pythonの例とスキーマは、本番環境のOpenAPI 3.1契約から生成されます。
+
+## レスポンス
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "公開投稿の例",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+
+「Try it」パネルは`api.easydown.org`へ直接リクエストします。トークンはページのメモリだけに保持され、再読み込みすると消去されます。
+
+<ApiReference path="/api/v1/parse" />

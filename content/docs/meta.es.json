@@ -1,0 +1,14 @@
+{
+  "title": "Documentación de API de descarga",
+  "pages": [
+    "index",
+    "quick-start",
+    "authentication",
+    "billing",
+    "errors",
+    "supported-links",
+    "media-downloads",
+    "mcp",
+    "api"
+  ]
+}

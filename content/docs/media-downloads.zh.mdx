@@ -1,0 +1,17 @@
+---
+title: "下载 API 返回的媒体"
+description: "正确使用 API 返回的视频、图片和音频 URL、公开请求头、清晰度信息、重定向及链接过期机制。"
+---
+
+`media` 对象将媒体拆分为 `images`、`videos` 和 `audios` 三个数组。
+
+## 响应字段
+
+- `url`：公开或带有效期的媒体 URL。
+- `quality`、`mimeType`、`width`、`height`、`bitrate`：用于选择媒体版本的信息。
+- `source`：媒体来源类型，包括 `direct`、`adaptive`、`dash`、`live_photo` 或 `native_voice`。
+- `headers`：媒体源要求的公开请求头，例如 `Referer`。
+
+## 限制与行为
+
+下载 URL 可能过期。请在解析后尽快下载、跟随重定向、完整保留查询参数，并且只发送媒体项中明确返回的公开请求头。EasyDown 不会把平台全量数据写入 Supabase。

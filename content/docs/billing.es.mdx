@@ -1,0 +1,16 @@
+---
+title: "Créditos y facturación de la API"
+description: "Consulta el cargo de 1 crédito por éxito, los fallos gratuitos, las cabeceras de saldo y el comportamiento de caché."
+---
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Respuesta
+
+Las respuestas comerciales correctas incluyen:
+
+- `X-Credits-Charged: 1`
+- `X-Credits-Remaining: {balance}`
+- `X-EasyDown-Cache: HIT | MISS | SUPABASE | BYPASS`
+
+Una respuesta desde caché también devuelve medios y consume 1 crédito. Una respuesta fallida nunca reduce el saldo.

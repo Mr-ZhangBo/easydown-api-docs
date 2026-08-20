@@ -1,0 +1,18 @@
+---
+title: "Video Downloader MCP server"
+description: "Connect the EasyDown social media video downloader to MCP clients with the same token, permissions, and credit rules."
+---
+
+EasyDown exposes a video downloader MCP endpoint at `https://api.easydown.org/mcp`.
+
+## API authentication
+
+Send the token in the Authorization header. Never place production tokens in URLs, client logs, source control, or analytics.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Limits and behavior
+
+- Keep the token in the MCP client's secure secret store.
+- Do not place it in prompts, tool arguments, URLs, or shared configuration files.
+- REST and MCP requests use the same success-only credit policy.

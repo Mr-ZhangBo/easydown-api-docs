@@ -1,0 +1,48 @@
+---
+title: "Video Downloader API quick start"
+description: "Send your first authenticated social media video downloader API request and read the normalized media response."
+---
+
+## 1. API authentication
+
+Send the token in the Authorization header. Never place production tokens in URLs, client logs, source control, or analytics.
+
+## 2. Request
+
+```bash
+curl --request POST \
+  --url https://api.easydown.org/api/v1/parse \
+  --header 'Authorization: Bearer ed_live_your_token' \
+  --header 'Content-Type: application/json' \
+  --data '{"url":"https://www.youtube.com/watch?v=BiBY6TeIvJ4"}'
+```
+
+## 3. Response
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "Example public post",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.

@@ -1,0 +1,48 @@
+---
+title: "動画ダウンロードAPIクイックスタート"
+description: "認証付きの最初のSNS動画ダウンロードAPIリクエストを送り、正規化メディアレスポンスを確認します。"
+---
+
+## 1. 動画APIの認証
+
+トークンはAuthorizationヘッダーで送信します。本番トークンをURL、クライアントログ、ソース管理、分析イベントに保存しないでください。
+
+## 2. リクエスト
+
+```bash
+curl --request POST \
+  --url https://api.easydown.org/api/v1/parse \
+  --header 'Authorization: Bearer ed_live_your_token' \
+  --header 'Content-Type: application/json' \
+  --data '{"url":"https://www.youtube.com/watch?v=BiBY6TeIvJ4"}'
+```
+
+## 3. レスポンス
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "公開投稿の例",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。認証、入力検証、権限、コンテンツ利用不可、メディアなし、外部サービス障害は課金されません。

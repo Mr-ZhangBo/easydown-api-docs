@@ -1,0 +1,157 @@
+---
+title: "Bilibili Video Downloader API"
+description: "Use EasyDown's Bilibili (mainland China) video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Several Bilibili URL families are normalized into one selected video item. The REST response keeps available video, separate audio, thumbnail, duration, and quality data.
+
+Use it to build a Bilibili video downloader for mainland China video, bangumi, cheese, and b23.tv links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/bilibili/parse`
+
+## Supported URL formats
+
+- `bilibili.com/video/BV{id}`
+- `bilibili.com/video/av{id}`
+- `b23.tv/{code}`
+- `bilibili.com/bangumi/play/{id}`
+- `bilibili.com/cheese/play/{id}`
+
+### Accepted examples
+
+- `https://www.bilibili.com/video/BV1sW4y197cE/`
+- `https://www.bilibili.com/video/av45306969/`
+- `https://b23.tv/INJgdai`
+
+> Bilibili support is limited to mainland China URLs. bilibili.tv and bili.im (Bstation / international) are not supported.
+
+## What the platform response contains
+
+Some qualities use DASH with separate videos[] and audios[] entries. Download both selected streams and merge them with FFmpeg without re-encoding when compatible.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Bilibili (mainland China); currently `1`. |
+| `data.platformData.title` | `string` | Public video title. |
+| `data.platformData.pic` | `string` | Public cover image URL. |
+| `data.platformData.timelength` | `number` | Duration in milliseconds. |
+| `data.platformData.dash` | `object` | Separate DASH video and audio renditions. |
+| `data.platformData.support_formats` | `array` | Quality labels and supported playback formats. |
+| `data.platformData.quality` | `number` | Selected quality identifier when exposed. |
+| `data.platformData.format` | `string` | Selected playback format when exposed. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "bilibili",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "title": "Example public Bilibili video",
+      "pic": "https://media.example/cover.jpg",
+      "timelength": 65000,
+      "dash": {
+        "video": [
+          {
+            "id": 80,
+            "width": 1920,
+            "height": 1080,
+            "mimeType": "video/mp4",
+            "baseUrl": "https://media.example/video.m4s"
+          }
+        ],
+        "audio": [
+          {
+            "id": 30280,
+            "bandwidth": 128000,
+            "mimeType": "audio/mp4",
+            "baseUrl": "https://media.example/audio.m4s"
+          }
+        ]
+      },
+      "support_formats": [
+        {
+          "quality": 80,
+          "new_description": "1080P"
+        }
+      ]
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Send Referer: https://www.bilibili.com/, a browser User-Agent, and forwarded Range headers. Signed stream URLs expire and must be refreshed by parsing the original page again.
+
+## Limits and behavior
+
+Profiles, favorites, watch-later lists, list pages without one video ID, paid content, DRM media, and region-restricted items are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Merge selected DASH video and audio streams before delivery to users.
+- Always include the Bilibili Referer when fetching signed streams.
+- Re-parse when a stream returns 403 or its signature expires.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/bilibili/parse" />

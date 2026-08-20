@@ -1,0 +1,146 @@
+---
+title: "快手 / Kwai 视频下载 API"
+description: "使用 快手 / Kwai 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+分享链接会尽量解析为 photo ID，再返回统一的视频、封面、尺寸和时长字段，不暴露三方特有响应结构。
+
+适合增加快手或 Kwai 视频下载能力，处理已支持的公开视频和短链。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/kuaishou/parse`
+
+## 支持的 URL 格式
+
+- `kuaishou.com/short-video/{id}`
+- `v.kuaishou.com/{code}`
+- `kwai.com/@{user}/video/{id}`
+
+### 可用示例
+
+- `https://v.kuaishou.com/JuuRuozy`
+- `https://www.kuaishou.com/short-video/3x2cvn2u7fq8k8s`
+- `https://www.kwai.com/@volana390/video/5207718655495282041`
+
+## 该平台响应会返回什么
+
+返回公开作品的全部可用视频 URL 和内容封面，并在源站提供时保留尺寸与时长。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | 快手 / Kwai的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.photoId` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.caption` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.author` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.mainMvUrls` | `array` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.manifest` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.coverUrls` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.duration` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+| `data.platformData.width` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+| `data.platformData.height` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "kuaishou",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "photoId": "3x2cvn2u7fq8k8s",
+      "caption": "Example public Kuaishou video",
+      "author": {
+        "name": "Example creator"
+      },
+      "mainMvUrls": [
+        {
+          "quality": "720p",
+          "url": "https://media.example/video.mp4"
+        }
+      ],
+      "coverUrls": [
+        {
+          "url": "https://media.example/cover.jpg"
+        }
+      ],
+      "duration": 12000,
+      "width": 720,
+      "height": 1280
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+后端携带快手 Referer、浏览器 User-Agent 并透传 Range；大视频应流式代理，不要完整载入服务器内存。
+
+## 限制与行为
+
+不支持主页、直播间、搜索、合集、私密作品、已删除作品、过期分享 Token 和地区不可用视频。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 使用短 Token 时提交完整 URL 或分享文案。
+- 大视频使用流式传输并透传 Range，以支持续传。
+- 解析后的作品 URL 过期时重新解析。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/kuaishou/parse" />

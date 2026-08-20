@@ -1,0 +1,134 @@
+---
+title: "Toutiao Video Downloader API"
+description: "Use EasyDown's Toutiao video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+The numeric-looking group ID stays a string through the REST workflow so large identifiers cannot lose precision before the Toutiao video lookup.
+
+Use it when an application needs a Toutiao video downloader API for supported public article and video links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/toutiao/parse`
+
+## Supported URL formats
+
+- `toutiao.com/video/{id}`
+
+### Accepted examples
+
+- `https://www.toutiao.com/video/7613611314560369152/`
+- `https://www.toutiao.com/video/7501991960077500979/`
+
+## What the platform response contains
+
+Every video-list item can contribute both main and backup URLs. First frames, covers, and content thumbnails remain available in images[] for product previews.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Toutiao; currently `1`. |
+| `data.platformData.group_id` | `string` | Toutiao content group identifier when present. |
+| `data.platformData.item_id` | `string` | Toutiao item identifier when present. |
+| `data.platformData.title` | `string` | Public video title. |
+| `data.platformData.abstract` | `string` | Public content summary. |
+| `data.platformData.poster_url` | `string` | Poster image URL. |
+| `data.platformData.video_duration` | `number` | Video duration reported by Toutiao. |
+| `data.platformData.video_play_info` | `object` | Play information object; older responses can expose the same data as a JSON string. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "toutiao",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "group_id": "7613611314560369152",
+      "item_id": "7613611314560369152",
+      "title": "Example public Toutiao video",
+      "poster_url": "https://media.example/poster.jpg",
+      "video_duration": 18,
+      "video_play_info": {
+        "video_list": {
+          "video_1": {
+            "main_url": "https://media.example/video.mp4"
+          }
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use Referer: https://www.toutiao.com/, a browser User-Agent, and forwarded Range headers. Stream the selected main or backup URL from your backend and re-parse after expiration.
+
+## Limits and behavior
+
+Articles, group pages, profiles, search pages, channels, short links, live pages, private content, and URLs without one video ID are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Keep the group ID as a string in JavaScript and database columns.
+- Try a backup URL when the selected main stream is unavailable.
+- Submit a `/video/{id}` page rather than an article or group URL.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/toutiao/parse" />

@@ -1,0 +1,160 @@
+---
+title: "API de descarga de videos de Threads"
+description: "Usa la API de Threads con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+EasyDown resuelve los enlaces compartidos de Threads, convierte el shortcode localmente en un ID numérico sin perder precisión y realiza una sola petición de detalle.
+
+Úsala para crear un descargador de videos de Threads que devuelva solo la publicación solicitada.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/threads/parse`
+
+## Formatos de URL compatibles
+
+- `threads.com/@{user}/post/{id}`
+- `threads.net/@{user}/post/{id}`
+- `threads.com/@{user}/post/{id}/media`
+- `threads.net/@{user}/post/{id}/media`
+- `threads.com/share/{code}`
+- `threads.net/share/{code}`
+- `Supported post and share links may include query parameters`
+
+### Ejemplos aceptados
+
+- `https://www.threads.com/@eekeai/post/DDhV3LWhrlk`
+- `https://www.threads.com/share/_5O7Rn7A0/`
+
+## Contenido de la respuesta de la plataforma
+
+Devuelve videos e imágenes de los campos directos, carruseles y text_post_app_info.linked_inline_media, conservando las variantes del proveedor.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de Threads; actualmente `1`. |
+| `data.platformData.id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.code` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.text` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.user` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.images` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.image_versions2` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+| `data.platformData.video_versions` | `array` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.carousel_media` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.text_post_app_info` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "threads",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "example-thread-id",
+      "code": "DDhV3LWhrlk",
+      "text": "Example public Threads post",
+      "user": {
+        "username": "creator"
+      },
+      "image_versions2": {
+        "candidates": []
+      },
+      "video_versions": [],
+      "text_post_app_info": {
+        "linked_inline_media": {
+          "code": "DaOF2fAtXRh",
+          "image_versions2": {
+            "candidates": [
+              {
+                "url": "https://media.example/cover.jpg",
+                "width": 540,
+                "height": 960
+              }
+            ]
+          },
+          "video_versions": [
+            {
+              "type": 101,
+              "url": "https://media.example/video.mp4"
+            }
+          ]
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con Referer de Threads o Instagram y User-Agent de navegador. Las URL de la CDN pueden caducar o bloquear solicitudes sin contexto.
+
+## Límites y comportamiento
+
+No admite publicaciones de solo texto, perfiles, feeds de respuestas, búsquedas, contenido privado ni publicaciones eliminadas.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Envía una URL de publicación, /media o /share/ de threads.com o threads.net.
+- Trata una publicación realmente textual como un resultado sin contenido multimedia.
+- Lee linked_inline_media además de los campos directos y del carrusel.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/threads/parse" />

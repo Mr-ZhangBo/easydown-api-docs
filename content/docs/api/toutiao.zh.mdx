@@ -1,0 +1,134 @@
+---
+title: "今日头条视频下载 API"
+description: "使用 今日头条（Toutiao） 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+看似数字的 group ID 在整个 REST 流程中始终保持字符串，避免调用头条视频查询前丢失大整数精度。
+
+适合需要今日头条视频下载能力的应用，处理已支持的文章和视频链接。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/toutiao/parse`
+
+## 支持的 URL 格式
+
+- `toutiao.com/video/{id}`
+
+### 可用示例
+
+- `https://www.toutiao.com/video/7613611314560369152/`
+- `https://www.toutiao.com/video/7501991960077500979/`
+
+## 该平台响应会返回什么
+
+video_list 每一项都可能贡献主、备用 URL；首帧、封面和内容缩略图保留在 images[] 中供产品预览。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | 今日头条（Toutiao）的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.group_id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.item_id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.title` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.abstract` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.poster_url` | `string` | 平台公开返回的媒体、封面或作品详情地址。 |
+| `data.platformData.video_duration` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+| `data.platformData.video_play_info` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "toutiao",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "group_id": "7613611314560369152",
+      "item_id": "7613611314560369152",
+      "title": "Example public Toutiao video",
+      "poster_url": "https://media.example/poster.jpg",
+      "video_duration": 18,
+      "video_play_info": {
+        "video_list": {
+          "video_1": {
+            "main_url": "https://media.example/video.mp4"
+          }
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+后端携带今日头条 Referer、浏览器 User-Agent 并透传 Range，流式代理所选主或备用 URL，过期后重新解析。
+
+## 限制与行为
+
+不支持文章、group 页面、主页、搜索、频道、短链、直播、私密内容和不含单视频 ID 的链接。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 在 JavaScript 和数据库字段中始终把 group ID 保存为字符串。
+- 所选主视频流不可用时尝试备用 URL。
+- 提交 `/video/{id}` 页面，不要提交文章或 group URL。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/toutiao/parse" />

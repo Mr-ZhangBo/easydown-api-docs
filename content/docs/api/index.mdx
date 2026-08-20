@@ -1,0 +1,31 @@
+---
+title: "Platform video downloader APIs"
+description: "Compare the 11 platform-specific EasyDown video downloader APIs, supported URL formats, downloadable media, complete sanitized platform data, and request schemas."
+---
+
+Choose a platform endpoint when your integration needs both the stable EasyDown media model and the final sanitized public data object for the requested post.
+
+<Cards>
+  <Card title="TikTok Video Downloader API" href="/en/api/tiktok" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="Douyin Video Downloader API" href="/en/api/douyin" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="Toutiao Video Downloader API" href="/en/api/toutiao" description="`images[]`, `videos[]`" />
+  <Card title="YouTube Video Downloader API" href="/en/api/youtube" description="`videos[]`, `audios[]`" />
+  <Card title="Twitter / X Video Downloader API" href="/en/api/twitter" description="`images[]`, `videos[]`" />
+  <Card title="Instagram Video Downloader API" href="/en/api/instagram" description="`images[]`, `videos[]`" />
+  <Card title="Threads Video Downloader API" href="/en/api/threads" description="`images[]`, `videos[]`" />
+  <Card title="RedNote / Xiaohongshu Video Downloader API" href="/en/api/xiaohongshu" description="`images[]`, `videos[]`" />
+  <Card title="Bilibili Video Downloader API" href="/en/api/bilibili" description="`videos[]`, `audios[]`" />
+  <Card title="Kuaishou / Kwai Video Downloader API" href="/en/api/kuaishou" description="`videos[]`" />
+  <Card title="Weibo Video Downloader API" href="/en/api/weibo" description="`images[]`, `videos[]`" />
+</Cards>
+
+## Choose an API response
+
+| API | Use it when |
+|---|---|
+| [`POST /api/v1/parse`](/en/api/common) | You need one stable media model across every supported platform. |
+| `POST /api/v1/platforms/{platform}/parse` | You need normalized media and the final sanitized platform data object. |
+
+## API credits and billing
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.

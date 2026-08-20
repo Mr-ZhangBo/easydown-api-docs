@@ -1,0 +1,160 @@
+---
+title: "Threads 视频与图片下载 API"
+description: "使用 Threads 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+EasyDown 会解析 Threads 分享跳转，在本地把 shortcode 无精度损失地转换为数值帖子 ID，并只请求一次目标帖子详情。
+
+适合构建 Threads 视频下载功能，只返回请求 URL 对应的目标帖子。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/threads/parse`
+
+## 支持的 URL 格式
+
+- `threads.com/@{user}/post/{id}`
+- `threads.net/@{user}/post/{id}`
+- `threads.com/@{user}/post/{id}/media`
+- `threads.net/@{user}/post/{id}/media`
+- `threads.com/share/{code}`
+- `threads.net/share/{code}`
+- `Supported post and share links may include query parameters`
+
+### 可用示例
+
+- `https://www.threads.com/@eekeai/post/DDhV3LWhrlk`
+- `https://www.threads.com/share/_5O7Rn7A0/`
+
+## 该平台响应会返回什么
+
+媒体帖会返回直属字段、轮播及 text_post_app_info.linked_inline_media 中的全部有效视频与图片候选，并保留上游重复规格。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | Threads的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.code` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.text` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.user` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.images` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.image_versions2` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.video_versions` | `array` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.carousel_media` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.text_post_app_info` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "threads",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "example-thread-id",
+      "code": "DDhV3LWhrlk",
+      "text": "Example public Threads post",
+      "user": {
+        "username": "creator"
+      },
+      "image_versions2": {
+        "candidates": []
+      },
+      "video_versions": [],
+      "text_post_app_info": {
+        "linked_inline_media": {
+          "code": "DaOF2fAtXRh",
+          "image_versions2": {
+            "candidates": [
+              {
+                "url": "https://media.example/cover.jpg",
+                "width": 540,
+                "height": 960
+              }
+            ]
+          },
+          "video_versions": [
+            {
+              "type": 101,
+              "url": "https://media.example/video.mp4"
+            }
+          ]
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+使用后端代理并携带浏览器 User-Agent 与对应 Threads Referer。源签名和规格可能变化，返回 URL 只适合短期保存。
+
+## 限制与行为
+
+纯文本帖子、主页、内容流、回复、搜索结果、私密和已删除帖子不会返回可下载媒体。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 使用 threads.com 或 threads.net 的帖子、/media 或 /share/ 分享链接。
+- 纯文本成功响应应按无媒体结果处理。
+- 除直属和轮播媒体外，也要读取 linked_inline_media。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/threads/parse" />

@@ -1,0 +1,31 @@
+---
+title: "各平台视频下载 API"
+description: "对比 EasyDown 11 个平台专用视频下载 API，查看支持的 URL、可下载媒体、清理后的平台全量数据和请求模式。"
+---
+
+当业务既需要稳定的 EasyDown 媒体结构，也需要请求作品对应的完整公开平台数据时，请选择平台专用接口。
+
+<Cards>
+  <Card title="TikTok 视频下载 API" href="/zh/api/tiktok" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="抖音视频下载 API" href="/zh/api/douyin" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="今日头条视频下载 API" href="/zh/api/toutiao" description="`images[]`, `videos[]`" />
+  <Card title="YouTube 视频下载 API" href="/zh/api/youtube" description="`videos[]`, `audios[]`" />
+  <Card title="Twitter / X 视频下载 API" href="/zh/api/twitter" description="`images[]`, `videos[]`" />
+  <Card title="Instagram 视频与图片下载 API" href="/zh/api/instagram" description="`images[]`, `videos[]`" />
+  <Card title="Threads 视频与图片下载 API" href="/zh/api/threads" description="`images[]`, `videos[]`" />
+  <Card title="小红书 / RedNote 视频与图片下载 API" href="/zh/api/xiaohongshu" description="`images[]`, `videos[]`" />
+  <Card title="Bilibili / B站视频下载 API" href="/zh/api/bilibili" description="`videos[]`, `audios[]`" />
+  <Card title="快手 / Kwai 视频下载 API" href="/zh/api/kuaishou" description="`videos[]`" />
+  <Card title="微博视频与图片下载 API" href="/zh/api/weibo" description="`images[]`, `videos[]`" />
+</Cards>
+
+## 选择合适的响应结构
+
+| 接口 | 适用场景 |
+|---|---|
+| [`POST /api/v1/parse`](/zh/api/common) | 需要用一套稳定媒体结构处理所有已支持平台。 |
+| `POST /api/v1/platforms/{platform}/parse` | 除了统一媒体结构，还需要目标作品经过清理的平台全量数据。 |
+
+## API 计费与额度
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。

@@ -1,0 +1,149 @@
+---
+title: "API de descarga de videos de Xiaohongshu / RedNote"
+description: "Usa la API de RedNote / Xiaohongshu con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una nota pública o un enlace corto compatible de RedNote/Xiaohongshu. La API devuelve el video y todos los elementos de la galería solicitada.
+
+Úsala para integrar descarga de videos de RedNote y Xiaohongshu, incluidos los enlaces cortos compatibles.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/xiaohongshu/parse`
+
+## Formatos de URL compatibles
+
+- `xiaohongshu.com/explore/{id}`
+- `xiaohongshu.com/discovery/item/{id}`
+- `rednote.com/explore/{id}`
+- `xhslink.com/{path}`
+- `xhslink.cn/{path}`
+
+### Ejemplos aceptados
+
+- `https://www.xiaohongshu.com/discovery/item/67f75b07000000000b0154b3`
+- `https://www.xiaohongshu.com/explore/671e2c6500000000210016b9`
+- `https://www.rednote.com/explore/6a51ee42000000001702879f`
+- `http://xhslink.com/o/2CxGwu8nSPx`
+
+## Contenido de la respuesta de la plataforma
+
+Una nota puede devolver video, portada y todas las imágenes del carrusel, cada elemento como archivo independiente.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de RedNote / Xiaohongshu; actualmente `1`. |
+| `data.platformData.note_id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.title` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.desc` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.type` | `string` | Campo público incluido en la respuesta de la plataforma para el contenido solicitado. |
+| `data.platformData.user` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.images_list` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.video_info_v2` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.interact_info` | `object` | Métricas públicas de reproducciones, Me gusta, comentarios, guardados o compartidos. |
+| `data.platformData.native_voice_info` | `object` | Información pública de música, sonido original o pistas de audio independientes. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "xiaohongshu",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "note_id": "67f75b07000000000b0154b3",
+      "title": "Example public RedNote post",
+      "desc": "Example note description",
+      "type": "video",
+      "user": {
+        "user_id": "creator-id",
+        "nickname": "Example creator"
+      },
+      "images_list": [
+        {
+          "width": 1080,
+          "height": 1440,
+          "url": "https://media.example/image.jpg"
+        }
+      ],
+      "interact_info": {
+        "liked_count": "120",
+        "collected_count": "24"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con Referer de Xiaohongshu, User-Agent y Range. Conserva los parámetros de las URL firmadas y vuelve a analizar cuando caduquen.
+
+## Límites y comportamiento
+
+No admite perfiles, búsquedas, colecciones, notas privadas o eliminadas ni enlaces cortos que ya hayan caducado.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Resuelve el enlace corto y conserva el note_id como texto antes de guardarlo en caché.
+- Recorre images[] completo para no perder elementos de una publicación con varias imágenes.
+- Vuelve a analizar la nota si una URL multimedia firmada ha caducado.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/xiaohongshu/parse" />

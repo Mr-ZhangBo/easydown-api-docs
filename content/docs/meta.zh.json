@@ -1,0 +1,14 @@
+{
+  "title": "视频下载 API 文档",
+  "pages": [
+    "index",
+    "quick-start",
+    "authentication",
+    "billing",
+    "errors",
+    "supported-links",
+    "media-downloads",
+    "mcp",
+    "api"
+  ]
+}

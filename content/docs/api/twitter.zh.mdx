@@ -1,0 +1,141 @@
+---
+title: "Twitter / X 视频下载 API"
+description: "使用 Twitter / X 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+x.com 与 twitter.com 的 status 链接进入同一 REST 流程，大整数帖子 ID 始终按字符串处理，并保留全部媒体规格。
+
+同时适用于 X 视频下载和 Twitter 视频下载场景，可接收 x.com 与 twitter.com 链接。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/twitter/parse`
+
+## 支持的 URL 格式
+
+- `x.com/{user}/status/{id}`
+- `twitter.com/{user}/status/{id}`
+
+### 可用示例
+
+- `https://x.com/i/status/2064933214720803143`
+- `https://x.com/Taozhishuishui/status/2041638397358260556/video/1`
+
+## 该平台响应会返回什么
+
+视频帖子可能返回多种码率和尺寸；图片帖子会保留全部正文图片，不会用缩略图替代原媒体。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | Twitter / X的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.id_str` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.text` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.full_text` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.user` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.media` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.metrics` | `object` | 平台公开展示的播放、点赞、评论、收藏或分享等互动统计。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "twitter",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id_str": "2064933214720803143",
+      "full_text": "Example public X post",
+      "user": {
+        "screen_name": "creator",
+        "name": "Example creator"
+      },
+      "media": {
+        "video": [
+          {
+            "variants": [
+              {
+                "content_type": "video/mp4",
+                "bitrate": 832000,
+                "url": "https://media.example/video.mp4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+后端下载时携带 X Referer 与浏览器 User-Agent，大文件透传 Range；所选规格过期后重新解析。
+
+## 限制与行为
+
+不支持主页、搜索页、Spaces、社区、Broadcast、私密帖子、已删除帖子和 CDN 直链。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 提交包含单个帖子 ID 的 status URL。
+- 按清晰度和尺寸选择 videos[]，不要只依赖数组位置。
+- 媒体规格失效时重新解析原始 status。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/twitter/parse" />

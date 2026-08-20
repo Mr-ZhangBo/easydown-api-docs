@@ -1,0 +1,141 @@
+---
+title: "API de descarga de videos de Twitter / X"
+description: "Usa la API de Twitter / X con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una URL de estado de x.com o twitter.com. La API conserva los identificadores largos como texto y devuelve todas las variantes multimedia de la publicación.
+
+Úsala para descargar videos de X o Twitter y aceptar tanto enlaces de x.com como de twitter.com.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/twitter/parse`
+
+## Formatos de URL compatibles
+
+- `x.com/{user}/status/{id}`
+- `twitter.com/{user}/status/{id}`
+
+### Ejemplos aceptados
+
+- `https://x.com/i/status/2064933214720803143`
+- `https://x.com/Taozhishuishui/status/2041638397358260556/video/1`
+
+## Contenido de la respuesta de la plataforma
+
+Muestra las variantes de video accesibles desde la publicación pública, con la calidad indicada cuando está disponible.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de Twitter / X; actualmente `1`. |
+| `data.platformData.id_str` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.text` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.full_text` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.user` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.media` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+| `data.platformData.metrics` | `object` | Métricas públicas de reproducciones, Me gusta, comentarios, guardados o compartidos. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "twitter",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id_str": "2064933214720803143",
+      "full_text": "Example public X post",
+      "user": {
+        "screen_name": "creator",
+        "name": "Example creator"
+      },
+      "media": {
+        "video": [
+          {
+            "variants": [
+              {
+                "content_type": "video/mp4",
+                "bitrate": 832000,
+                "url": "https://media.example/video.mp4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con Referer de X, User-Agent de navegador y Range. Selecciona la variante por calidad y vuelve a analizar si caduca.
+
+## Límites y comportamiento
+
+No admite perfiles, búsquedas, Spaces, publicaciones privadas o eliminadas ni enlaces directos de la CDN multimedia.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Envía una URL de estado que contenga un único identificador de publicación.
+- Elige una variante de videos[] por calidad y dimensiones, no solo por su posición.
+- Vuelve a analizar el estado original cuando una variante multimedia deje de responder.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/twitter/parse" />

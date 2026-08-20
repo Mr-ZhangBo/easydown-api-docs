@@ -1,0 +1,25 @@
+---
+title: "Códigos de error de la API de descarga"
+description: "Gestiona códigos estables para URL no compatibles, contenido no disponible, ausencia de medios, plataforma incorrecta y fallos externos."
+---
+
+| Campo | Descripción |
+|---|---|
+| `platform_mismatch` | La URL pertenece a otra plataforma |
+| `unsupported_url` | El formato de URL no es compatible |
+| `content_unavailable` | El contenido es privado, eliminado, restringido o no disponible |
+| `no_media` | No se encontraron medios descargables |
+| `upstream_unavailable` | El servicio de la plataforma no está disponible temporalmente |
+
+## Respuesta
+
+```json
+{
+  "status": 404,
+  "data": null,
+  "msg": "The content is unavailable",
+  "code": "content_unavailable"
+}
+```
+
+EasyDown nunca devuelve nombres de proveedores, identificadores de solicitud, endpoints internos, avisos de cobro, credenciales, trazas ni errores externos sin filtrar.

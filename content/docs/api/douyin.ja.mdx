@@ -1,0 +1,148 @@
+---
+title: "Douyin 動画ダウンロード API"
+description: "Douyin（抖音）の対応する公開URLを解析し、ダウンロード可能な動画・画像・音声と、機密項目を除去したプラットフォームデータを取得します。URL形式、レスポンス項目、エラー、実装例を掲載しています。"
+---
+
+作品 ID を文字列として保持し、必要に応じて共有 URL を解決して動画・画像ノートを同じ REST 形式で返します。
+
+対応する公開動画、画像投稿、共有URLを扱うDouyin動画ダウンロード機能の実装に適しています。
+
+安定したダウンロードメディアに加えてプラットフォーム固有項目が必要な場合に使用します。
+
+## エンドポイント
+
+`POST https://api.easydown.org/api/v1/platforms/douyin/parse`
+
+## 対応URL形式
+
+- `douyin.com/video/{id}`
+- `douyin.com/note/{id}`
+- `douyin.com/shipin/{id}`
+- `v.douyin.com/{code}`
+
+### 利用可能な例
+
+- `https://v.douyin.com/f-QpBB_oD9Y/`
+- `https://www.douyin.com/video/7641191614632071546`
+- `https://www.douyin.com/note/7643104807914401929`
+- `https://www.douyin.com/shipin/7643609848361355302`
+
+## このプラットフォームのレスポンス内容
+
+動画画質、音声、カバー、ノート画像を返し、対応するメディア直 URL では不要な投稿検索を行いません。
+
+## 公開済みプラットフォームデータ項目
+
+対象投稿の最終レスポンスに含まれるその他の公開項目も、機密情報を再帰的に除去したうえで保持します。以下の項目は現在の platformDataVersion 内で安定しています。
+
+| 項目 | 型 | 説明 |
+|---|---|---|
+| `data.media` | `object` | 正規化された画像、動画、音声、タイトル、サムネイル、再生時間。 |
+| `data.platformDataVersion` | `string` | Douyin（抖音）の公開データ契約バージョン。現在は`1`です。 |
+| `data.platformData.aweme_id` | `string` | 対象投稿の公開識別子です。大きな数値の精度を失わないよう文字列として保存します。 |
+| `data.platformData.desc` | `string` | 対象投稿に公開表示されるタイトル、本文、説明です。 |
+| `data.platformData.author` | `object` | 対象投稿の投稿者に関する公開プロフィール項目です。連絡先や認証情報は含みません。 |
+| `data.platformData.video` | `object` | 動画の再生候補、画質、コーデック、サイズ、メディアURLに関する情報です。 |
+| `data.platformData.images` | `array` | 対象投稿の画像、カバー、カルーセル項目です。配列順はプラットフォームの返却順を維持します。 |
+| `data.platformData.music` | `object` | 対象投稿で公開されている楽曲、オリジナル音声、分離音声の情報です。 |
+| `data.platformData.statistics` | `object` | 再生、いいね、コメント、保存、共有など公開されているエンゲージメント指標です。 |
+| `data.platformData.media_url` | `string` | プラットフォームが公開しているメディア、カバー、詳細ページのURLです。 |
+| `data.platformData.media_type` | `string` | 再生状態、形式、その他の公開メタデータです。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "douyin",
+      "title": "公開投稿の例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7641191614632071546",
+      "desc": "Example public Douyin work",
+      "author": {
+        "uid": "creator-id",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 15000,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "music": {
+        "title": "Original audio"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## ダウンロードとプロキシの注意点
+
+Douyin Referer、ブラウザー User-Agent、Range を付けてバックエンド取得します。署名は短期間で、公開アクセス可能な地域が必要な場合があります。
+
+## 制限と動作
+
+作品 ID のないプロフィール、検索、フォロー、コレクション、ライブ、非公開・削除済み作品、地域制限メディアには対応しません。
+
+公開コンテンツのみ対象です。非公開、削除済み、年齢・地域制限、ライブ配信、その他利用できないコンテンツは解析に失敗する場合があります。失敗時にクレジットは消費されません。
+
+ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。認証、入力検証、権限、コンテンツ利用不可、メディアなし、外部サービス障害は課金されません。
+
+## トラブルシューティング
+
+- v.douyin.com の共有 URL を解決してから標準作品 URL を保存します。
+- 大きな動画では Range を転送します。
+- 署名 URL が 403/404 の場合はすぐに再解析します。
+
+## よくある質問
+
+### 失敗したリクエストは課金されますか？
+
+いいえ。ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。
+
+### 正しい公開URLでも失敗するのはなぜですか？
+
+投稿が削除済み、非公開、地域制限、ライブ、メディアなし、または外部サービスが一時的に利用できない可能性があります。
+
+## 関連ガイド
+
+- [全プラットフォームAPI](/ja/api)
+- [共通の正規化API](/ja/api/common)
+- [対応する全URL形式](/ja/supported-links)
+- [エラーコード](/ja/errors)
+- [メディアのダウンロード](/ja/media-downloads)
+- [API認証](/ja/authentication)
+- [料金とクレジット](/ja/billing)
+
+## 対話型APIリファレンス
+
+以下のcurl、JavaScript、Pythonの例とスキーマは、本番環境のOpenAPI 3.1契約から生成されます。
+
+「Try it」パネルは`api.easydown.org`へ直接リクエストします。トークンはページのメモリだけに保持され、再読み込みすると消去されます。
+
+<ApiReference path="/api/v1/platforms/douyin/parse" />

@@ -1,0 +1,144 @@
+---
+title: "API de descarga de videos de TikTok"
+description: "Usa la API de TikTok con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía a la API la URL de un video, una publicación de fotos o un enlace compartido de TikTok. EasyDown conserva las calidades y todos los elementos de la galería.
+
+Úsala para añadir descarga de videos de TikTok a una web, aplicación o automatización sin mantener extractores propios.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/tiktok/parse`
+
+## Formatos de URL compatibles
+
+- `tiktok.com/@{user}/video/{id}`
+- `tiktok.com/@{user}/photo/{id}`
+- `tiktok.com/t/{code}`
+
+### Ejemplos aceptados
+
+- `https://www.tiktok.com/@jesscreatescontent/video/7647557116596718861`
+- `https://www.tiktok.com/@creator/photo/7512345678901234567`
+- `https://www.tiktok.com/t/ZP8pT81pD/`
+
+## Contenido de la respuesta de la plataforma
+
+Puede devolver varias calidades de video, audio, portadas y todas las imágenes de una publicación fotográfica.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de TikTok; actualmente `1`. |
+| `data.platformData.aweme_id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.desc` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.author` | `object` | Datos públicos del autor de la publicación, sin contactos ni credenciales. |
+| `data.platformData.video` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.images` | `array` | Imágenes, portadas o elementos del carrusel; el orden coincide con la respuesta de la plataforma. |
+| `data.platformData.statistics` | `object` | Métricas públicas de reproducciones, Me gusta, comentarios, guardados o compartidos. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "tiktok",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7647557116596718861",
+      "desc": "Example public TikTok post",
+      "author": {
+        "unique_id": "creator",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 12,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "statistics": {
+        "play_count": 1200,
+        "digg_count": 84
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Usa un proxy de backend con Referer de TikTok y User-Agent de navegador. La disponibilidad puede variar por región y algunos medios requieren una cookie de tu propio contexto autorizado.
+
+## Límites y comportamiento
+
+No admite perfiles, directos, páginas de sonido, TikTok Lite, publicaciones privadas o eliminadas ni enlaces incompletos.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Resuelve los enlaces compartidos antes de guardar en caché la URL final de la publicación.
+- Vuelve a analizar cuando una URL multimedia caduque y responda con 403 o 404.
+- No expongas el token de la API ni cookies del sitio de origen en JavaScript del navegador.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/tiktok/parse" />

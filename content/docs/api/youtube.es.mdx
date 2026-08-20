@@ -1,0 +1,151 @@
+---
+title: "API de descarga de videos de YouTube"
+description: "Usa la API de YouTube con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una URL pública de YouTube, Shorts o youtu.be a la API. La respuesta conserva las variantes de video y audio para que el backend elija el formato adecuado.
+
+Úsala para añadir descarga de videos de YouTube y conservar un único modelo multimedia en toda la aplicación.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/youtube/parse`
+
+## Formatos de URL compatibles
+
+- `youtube.com/watch?v={id}`
+- `youtube.com/shorts/{id}`
+- `youtube.com/live/{id}`
+- `youtu.be/{id}`
+
+### Ejemplos aceptados
+
+- `https://www.youtube.com/watch?v=BiBY6TeIvJ4`
+- `https://youtu.be/MEoxtFRfPoc`
+- `https://www.youtube.com/shorts/xzOtM0x3_LU`
+
+## Contenido de la respuesta de la plataforma
+
+Puede mostrar distintas resoluciones y pistas de audio. Algunos formatos DASH de alta calidad requieren combinar video y audio después de descargarlos.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de YouTube; actualmente `1`. |
+| `data.platformData.videoDetails` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+| `data.platformData.streamingData` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+| `data.platformData.playabilityStatus` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+| `data.platformData.microformat` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+| `data.platformData.captions` | `object` | Estado de reproducción, formato u otros metadatos públicos del contenido. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "youtube",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "videoDetails": {
+        "videoId": "BiBY6TeIvJ4",
+        "title": "Example public YouTube video",
+        "lengthSeconds": "42",
+        "channelId": "channel-id"
+      },
+      "streamingData": {
+        "formats": [
+          {
+            "itag": 18,
+            "mimeType": "video/mp4",
+            "qualityLabel": "360p",
+            "url": "https://media.example/video.mp4"
+          }
+        ],
+        "adaptiveFormats": [
+          {
+            "itag": 140,
+            "mimeType": "audio/mp4",
+            "bitrate": 128000,
+            "url": "https://media.example/audio.m4a"
+          }
+        ]
+      },
+      "playabilityStatus": {
+        "status": "OK"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con User-Agent de navegador, Referer y Origin de YouTube, y reenvía Range. Algunos flujos dependen de la región o IP que realizó el análisis.
+
+## Límites y comportamiento
+
+No admite listas, canales, publicaciones de comunidad, videos privados, contenido para miembros, DRM ni bloqueos regionales.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Combina el video y el audio por separado cuando la calidad elegida no incluya sonido.
+- Vuelve a analizar la URL original si un flujo firmado caduca o responde con 403.
+- Usa una región de backend que tenga acceso cuando el video público esté limitado geográficamente.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/youtube/parse" />

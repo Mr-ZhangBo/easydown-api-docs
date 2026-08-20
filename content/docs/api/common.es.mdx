@@ -1,0 +1,42 @@
+---
+title: "API unificada para descargar videos de redes sociales"
+description: "Convierte cualquier URL social compatible en una respuesta normalizada de video, imagen y audio mediante POST /api/v1/parse."
+---
+
+El endpoint común conserva el contrato compacto: `data` es el objeto multimedia normalizado y no incluye `platformData`.
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+## Respuesta
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "Ejemplo de publicación pública",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/parse" />

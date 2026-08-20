@@ -1,0 +1,62 @@
+{
+  "name": "easydown-api-docs",
+  "version": "0.0.15",
+  "description": "Open-source multilingual documentation for the EasyDown social media video downloader API and MCP server.",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://docs.easydown.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mr-ZhangBo/easydown-api-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mr-ZhangBo/easydown-api-docs/issues"
+  },
+  "keywords": [
+    "api-documentation",
+    "fumadocs",
+    "mcp",
+    "nextjs",
+    "openapi",
+    "social-media-api",
+    "video-downloader-api"
+  ],
+  "scripts": {
+    "sync:api": "node scripts/sync-api-contract.mjs && node scripts/generate-content.mjs",
+    "check:seo": "node scripts/check-seo.mjs",
+    "check:seo:live": "node scripts/check-live-seo.mjs",
+    "check:links": "node scripts/check-documentation-links.mjs",
+    "predev": "npm run sync:api",
+    "prebuild": "npm run sync:api && npm run check:seo",
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start",
+    "types:check": "next typegen && tsc --noEmit",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@fumadocs/language": "^0.2.2",
+    "cnfast": "^0.1.0",
+    "fumadocs-core": "16.14.4",
+    "fumadocs-mdx": "15.2.3",
+    "fumadocs-openapi": "^11.2.4",
+    "fumadocs-ui": "npm:@fumadocs/base-ui@16.14.4",
+    "lucide-react": "^1.31.0",
+    "next": "16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "shiki": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.3.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}

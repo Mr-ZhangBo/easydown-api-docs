@@ -1,0 +1,149 @@
+---
+title: "微博视频与图片下载 API"
+description: "使用 微博（Weibo） 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+桌面正文、移动 status/detail、访客页和 t.cn 链接走正文流程；包含 1034 object ID 的微博视频页优先调用公开组件接口，仅在组件没有媒体时进入原有正文兜底。
+
+适合构建微博视频下载 API，处理已支持的公开微博正文和视频链接。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/weibo/parse`
+
+## 支持的 URL 格式
+
+- `weibo.com/{user}/{id}`
+- `m.weibo.cn/status/{id}`
+- `m.weibo.cn/detail/{id}`
+- `weibo.com/tv/show/{id}`
+- `video.weibo.com/show?fid={id}`
+- `t.cn/{code}`
+
+### 可用示例
+
+- `https://m.weibo.cn/status/5052484659707960`
+- `https://m.weibo.cn/detail/5320188317925845`
+- `https://weibo.com/1735344023/KlxqqfkYa`
+- `https://weibo.com/tv/show/1034:5302868002144396`
+
+## 该平台响应会返回什么
+
+视频微博和组件视频页保留全部可用播放清晰度与封面；图片微博返回目标图集中的全部原图。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | 微博（Weibo）的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.mid` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.mblogid` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.text_raw` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.user` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.pics` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.page_info` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.video_details_url` | `string` | 平台公开返回的媒体、封面或作品详情地址。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "weibo",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "5320188317925845",
+      "mid": "5320188317925845",
+      "text_raw": "Example public Weibo post",
+      "user": {
+        "screen_name": "Example creator"
+      },
+      "pics": [
+        {
+          "large": {
+            "url": "https://media.example/image.jpg"
+          }
+        }
+      ],
+      "page_info": {
+        "page_title": "Example video",
+        "media_info": {
+          "mp4_hd_url": "https://media.example/video.mp4"
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+EasyDown 网页端会让所有微博媒体下载统一走代理；REST 客户端也应通过后端代理携带微博 Referer、浏览器 User-Agent 并透传 Range，源 URL 过期后重新解析。
+
+## 限制与行为
+
+不支持主页、个人全部视频页、搜索、话题、超话、文章、直播、合集、私密和已删除帖子。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 缓存帖子标识前先解析 t.cn 短链。
+- 按画质元数据选择播放项，不要依赖数组顺序。
+- 图片或视频源签名过期后重新解析。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/weibo/parse" />

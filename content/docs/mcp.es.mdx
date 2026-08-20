@@ -1,0 +1,18 @@
+---
+title: "Servidor MCP de descarga de videos"
+description: "Conecta la descarga de videos de EasyDown a clientes MCP con el mismo token, permisos y reglas de créditos."
+---
+
+EasyDown ofrece un endpoint MCP de descarga en `https://api.easydown.org/mcp`.
+
+## Autenticación de la API
+
+Envía el token en la cabecera Authorization. No guardes tokens de producción en URL, registros del cliente, control de código ni eventos de analítica.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Límites y comportamiento
+
+- Guarda el token en el almacén seguro de secretos del cliente MCP.
+- No incluyas el token en prompts, argumentos de herramientas, URL ni archivos de configuración compartidos.
+- REST y MCP usan la misma regla: solo se cobra cuando se devuelven medios.

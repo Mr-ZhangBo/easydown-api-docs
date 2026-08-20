@@ -1,0 +1,157 @@
+---
+title: "Bilibili / B站视频下载 API"
+description: "使用 Bilibili / B站（仅大陆站） 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+多种 Bilibili URL 会被统一为一个选定视频项目，REST 响应保留可用视频、独立音频、缩略图、时长和画质数据。
+
+适合构建 Bilibili / B站视频下载能力，仅覆盖大陆站视频、番剧、课程和 b23.tv 链接。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/bilibili/parse`
+
+## 支持的 URL 格式
+
+- `bilibili.com/video/BV{id}`
+- `bilibili.com/video/av{id}`
+- `b23.tv/{code}`
+- `bilibili.com/bangumi/play/{id}`
+- `bilibili.com/cheese/play/{id}`
+
+### 可用示例
+
+- `https://www.bilibili.com/video/BV1sW4y197cE/`
+- `https://www.bilibili.com/video/av45306969/`
+- `https://b23.tv/INJgdai`
+
+> Bilibili 仅支持大陆站链接。bilibili.tv 与 bili.im（Bstation / 国际版）目前不支持。
+
+## 该平台响应会返回什么
+
+部分画质使用 DASH，视频与音频分别位于 videos[] 和 audios[]。选择两条流下载后，可在兼容时使用 FFmpeg 无重编码合并。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | Bilibili / B站（仅大陆站）的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.title` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.pic` | `string` | 平台公开返回的媒体、封面或作品详情地址。 |
+| `data.platformData.timelength` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+| `data.platformData.dash` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.support_formats` | `array` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.quality` | `number` | 平台返回的时长、尺寸、清晰度等技术参数。 |
+| `data.platformData.format` | `string` | 平台公开返回的播放状态、格式或补充元数据。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "bilibili",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "title": "Example public Bilibili video",
+      "pic": "https://media.example/cover.jpg",
+      "timelength": 65000,
+      "dash": {
+        "video": [
+          {
+            "id": 80,
+            "width": 1920,
+            "height": 1080,
+            "mimeType": "video/mp4",
+            "baseUrl": "https://media.example/video.m4s"
+          }
+        ],
+        "audio": [
+          {
+            "id": 30280,
+            "bandwidth": 128000,
+            "mimeType": "audio/mp4",
+            "baseUrl": "https://media.example/audio.m4s"
+          }
+        ]
+      },
+      "support_formats": [
+        {
+          "quality": 80,
+          "new_description": "1080P"
+        }
+      ]
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+下载时携带 Bilibili Referer、浏览器 User-Agent 并透传 Range。签名流过期后需要重新解析原始页面。
+
+## 限制与行为
+
+不支持主页、收藏夹、稍后再看、没有单视频 ID 的列表、付费内容、DRM 媒体和地区受限作品。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 向用户交付前合并选定的 DASH 视频与音频流。
+- 请求签名流时始终携带 Bilibili Referer。
+- 流返回 403 或签名过期时重新解析。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/bilibili/parse" />

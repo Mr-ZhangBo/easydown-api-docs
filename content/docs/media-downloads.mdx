@@ -1,0 +1,17 @@
+---
+title: "Download media from API responses"
+description: "Use video, image, and audio URLs, required public headers, quality metadata, and expiry behavior correctly."
+---
+
+The `media` object contains separate `images`, `videos`, and `audios` arrays.
+
+## Response fields
+
+- `url`: public or time-limited media URL.
+- `quality`, `mimeType`, `width`, `height`, `bitrate`: metadata for choosing a rendition.
+- `source`: `direct`, `adaptive`, `dash`, `live_photo`, or `native_voice`.
+- `headers`: public request headers required by the media host, such as `Referer`.
+
+## Limits and behavior
+
+Download URLs can expire. Fetch media soon after parsing, follow redirects, preserve URL query strings, and send only the public headers returned with that media item. EasyDown does not store full platform data in Supabase.

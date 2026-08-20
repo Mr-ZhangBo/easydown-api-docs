@@ -1,0 +1,151 @@
+---
+title: "YouTube Video Downloader API"
+description: "Use EasyDown's YouTube video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Send one public YouTube URL to the shared REST endpoint. The response preserves every available video and audio candidate so your backend can choose a format instead of accepting a single preselected file.
+
+Use it to add YouTube video downloader support while keeping one normalized media contract across your application.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/youtube/parse`
+
+## Supported URL formats
+
+- `youtube.com/watch?v={id}`
+- `youtube.com/shorts/{id}`
+- `youtube.com/live/{id}`
+- `youtu.be/{id}`
+
+### Accepted examples
+
+- `https://www.youtube.com/watch?v=BiBY6TeIvJ4`
+- `https://youtu.be/MEoxtFRfPoc`
+- `https://www.youtube.com/shorts/xzOtM0x3_LU`
+
+## What the platform response contains
+
+Videos can include progressive files and video-only streams. Separate audio candidates are returned in audios[]; high-quality DASH results may require FFmpeg merging after both streams are downloaded.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for YouTube; currently `1`. |
+| `data.platformData.videoDetails` | `object` | Title, duration, channel, thumbnails, and public video metadata. |
+| `data.platformData.streamingData` | `object` | Progressive and adaptive audio/video renditions. |
+| `data.platformData.playabilityStatus` | `object` | Public playback availability state. |
+| `data.platformData.microformat` | `object` | Public page and embed metadata when available. |
+| `data.platformData.captions` | `object` | Caption track metadata when exposed. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "youtube",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "videoDetails": {
+        "videoId": "BiBY6TeIvJ4",
+        "title": "Example public YouTube video",
+        "lengthSeconds": "42",
+        "channelId": "channel-id"
+      },
+      "streamingData": {
+        "formats": [
+          {
+            "itag": 18,
+            "mimeType": "video/mp4",
+            "qualityLabel": "360p",
+            "url": "https://media.example/video.mp4"
+          }
+        ],
+        "adaptiveFormats": [
+          {
+            "itag": 140,
+            "mimeType": "audio/mp4",
+            "bitrate": 128000,
+            "url": "https://media.example/audio.m4a"
+          }
+        ]
+      },
+      "playabilityStatus": {
+        "status": "OK"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Fetch media from your backend with a browser User-Agent, Referer: https://www.youtube.com/, Origin: https://www.youtube.com, and forwarded Range headers. Some streams are tied to the parsing server IP or region.
+
+## Limits and behavior
+
+Playlists, channels, community posts, private videos, members-only media, DRM-protected content, and region-unavailable videos are not supported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Merge separate video and audio streams when a selected quality has no audio.
+- Re-parse the source URL when a signed stream expires or returns 403.
+- Use an accessible backend region for region-limited public media.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/youtube/parse" />

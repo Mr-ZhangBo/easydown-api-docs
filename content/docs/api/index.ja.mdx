@@ -1,0 +1,31 @@
+---
+title: "プラットフォーム別動画ダウンロードAPI"
+description: "EasyDownの11種類のプラットフォーム別動画ダウンロードAPI、対応URL、取得メディア、サニタイズ済み完全データ、リクエストスキーマを比較します。"
+---
+
+共通のEasyDownメディア形式に加えて、指定投稿の完全な公開プラットフォームデータが必要な場合は、プラットフォーム別APIを使用します。
+
+<Cards>
+  <Card title="TikTok 動画ダウンロード API" href="/ja/api/tiktok" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="Douyin 動画ダウンロード API" href="/ja/api/douyin" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="Toutiao 動画ダウンロード API" href="/ja/api/toutiao" description="`images[]`, `videos[]`" />
+  <Card title="YouTube 動画ダウンロード API" href="/ja/api/youtube" description="`videos[]`, `audios[]`" />
+  <Card title="Twitter / X 動画ダウンロード API" href="/ja/api/twitter" description="`images[]`, `videos[]`" />
+  <Card title="Instagram 動画・画像ダウンロード API" href="/ja/api/instagram" description="`images[]`, `videos[]`" />
+  <Card title="Threads 動画・画像ダウンロード API" href="/ja/api/threads" description="`images[]`, `videos[]`" />
+  <Card title="Xiaohongshu / RedNote 動画・画像ダウンロード API" href="/ja/api/xiaohongshu" description="`images[]`, `videos[]`" />
+  <Card title="Bilibili 動画ダウンロード API" href="/ja/api/bilibili" description="`videos[]`, `audios[]`" />
+  <Card title="Kuaishou / Kwai 動画ダウンロード API" href="/ja/api/kuaishou" description="`videos[]`" />
+  <Card title="Weibo 動画・画像ダウンロード API" href="/ja/api/weibo" description="`images[]`, `videos[]`" />
+</Cards>
+
+## APIレスポンスの選び方
+
+| API | 適した用途 |
+|---|---|
+| [`POST /api/v1/parse`](/ja/api/common) | すべての対応プラットフォームを1つの安定したメディア形式で扱う場合。 |
+| `POST /api/v1/platforms/{platform}/parse` | 正規化メディアに加えて、機密項目を除去した完全なプラットフォームデータが必要な場合。 |
+
+## API料金とCredits
+
+ダウンロード可能なメディアを返した場合のみ1クレジットを消費します。認証、入力検証、権限、コンテンツ利用不可、メディアなし、外部サービス障害は課金されません。

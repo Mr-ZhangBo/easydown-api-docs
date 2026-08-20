@@ -1,0 +1,18 @@
+{
+  "title": "API de descarga por plataforma",
+  "pages": [
+    "index",
+    "common",
+    "tiktok",
+    "douyin",
+    "toutiao",
+    "youtube",
+    "twitter",
+    "instagram",
+    "threads",
+    "xiaohongshu",
+    "bilibili",
+    "kuaishou",
+    "weibo"
+  ]
+}

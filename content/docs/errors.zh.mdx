@@ -1,0 +1,25 @@
+---
+title: "视频下载 API 错误码"
+description: "处理视频链接不支持、内容不可用、无媒体、平台不匹配和上游故障等稳定错误码，并正确映射客户端提示。"
+---
+
+| 字段 | 说明 |
+|---|---|
+| `platform_mismatch` | URL 与请求的平台接口不匹配 |
+| `unsupported_url` | URL 形态暂不支持 |
+| `content_unavailable` | 作品私密、删除、受限或不可用 |
+| `no_media` | 未找到可下载媒体 |
+| `upstream_unavailable` | 平台服务暂时不可用 |
+
+## 响应
+
+```json
+{
+  "status": 404,
+  "data": null,
+  "msg": "The content is unavailable",
+  "code": "content_unavailable"
+}
+```
+
+EasyDown 不会返回第三方供应商名称、请求 ID、接口地址、计费提示、凭证、调用链或原始第三方错误文案。

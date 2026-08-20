@@ -1,0 +1,149 @@
+---
+title: "Weibo Video Downloader API"
+description: "Use EasyDown's Weibo video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Desktop, mobile status/detail, visitor, and t.cn links use the post workflow. Weibo video-show links with a 1034 object ID first use the public component endpoint and only enter the existing post fallbacks when component media is unavailable.
+
+Use it to build a Weibo video downloader for supported public status and video links.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/weibo/parse`
+
+## Supported URL formats
+
+- `weibo.com/{user}/{id}`
+- `m.weibo.cn/status/{id}`
+- `m.weibo.cn/detail/{id}`
+- `weibo.com/tv/show/{id}`
+- `video.weibo.com/show?fid={id}`
+- `t.cn/{code}`
+
+### Accepted examples
+
+- `https://m.weibo.cn/status/5052484659707960`
+- `https://m.weibo.cn/detail/5320188317925845`
+- `https://weibo.com/1735344023/KlxqqfkYa`
+- `https://weibo.com/tv/show/1034:5302868002144396`
+
+## What the platform response contains
+
+Video posts and component video pages keep every available playback quality and cover. Image posts return every original image discovered in the target gallery.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Weibo; currently `1`. |
+| `data.platformData.id` | `string` | Weibo status identifier. |
+| `data.platformData.mid` | `string` | Weibo numeric message identifier when exposed. |
+| `data.platformData.mblogid` | `string` | Public short message identifier when exposed. |
+| `data.platformData.text_raw` | `string` | Public plain-text post content. |
+| `data.platformData.user` | `object` | Public author profile fields. |
+| `data.platformData.pics` | `array` | All public image items attached to the post. |
+| `data.platformData.page_info` | `object` | Video page title, cover, and media information. |
+| `data.platformData.video_details_url` | `string` | Public video detail URL when exposed. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "weibo",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "id": "5320188317925845",
+      "mid": "5320188317925845",
+      "text_raw": "Example public Weibo post",
+      "user": {
+        "screen_name": "Example creator"
+      },
+      "pics": [
+        {
+          "large": {
+            "url": "https://media.example/image.jpg"
+          }
+        }
+      ],
+      "page_info": {
+        "page_title": "Example video",
+        "media_info": {
+          "mp4_hd_url": "https://media.example/video.mp4"
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+The EasyDown website routes every Weibo media download through its proxy. REST clients should likewise use a backend proxy with a Weibo Referer, browser User-Agent, and forwarded Range header, then re-parse expired source URLs.
+
+## Limits and behavior
+
+Profiles, personal video tabs, search pages, topics, super topics, articles, live pages, collections, private posts, and deleted posts are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Normalize t.cn links before caching a post identifier.
+- Choose a playback entry by quality metadata rather than relying on array order.
+- Re-parse image or video URLs after the source signature expires.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/weibo/parse" />

@@ -1,0 +1,48 @@
+---
+title: "视频下载 API 快速开始"
+description: "发送第一次带鉴权的社交媒体视频下载 API 请求，了解请求格式、统一媒体响应和成功扣费规则。"
+---
+
+## 1. API 鉴权
+
+请在 Authorization 请求头中发送 Token。不要把生产 Token 写入 URL、客户端日志、源码仓库或分析事件。
+
+## 2. 请求
+
+```bash
+curl --request POST \
+  --url https://api.easydown.org/api/v1/parse \
+  --header 'Authorization: Bearer ed_live_your_token' \
+  --header 'Content-Type: application/json' \
+  --data '{"url":"https://www.youtube.com/watch?v=BiBY6TeIvJ4"}'
+```
+
+## 3. 响应
+
+```json
+{
+  "status": 200,
+  "data": {
+    "platform": "youtube",
+    "title": "公开作品示例",
+    "thumbnail": "https://public-cdn.example/cover.jpg",
+    "duration": 18,
+    "images": [],
+    "videos": [
+      {
+        "url": "https://public-cdn.example/video.mp4",
+        "quality": "1080p",
+        "mimeType": "video/mp4",
+        "width": 1920,
+        "height": 1080,
+        "hasAudio": true,
+        "source": "direct"
+      }
+    ],
+    "audios": []
+  },
+  "msg": "success"
+}
+```
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。

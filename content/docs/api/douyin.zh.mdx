@@ -1,0 +1,148 @@
+---
+title: "抖音视频下载 API"
+description: "使用 抖音（Douyin） 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+EasyDown 始终按字符串处理作品 ID，在需要时解析分享链接，并用同一 REST 结构返回抖音视频和图文内容。
+
+适合构建抖音视频下载 API 后端，处理已支持的公开视频、图集和分享链接。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/douyin/parse`
+
+## 支持的 URL 格式
+
+- `douyin.com/video/{id}`
+- `douyin.com/note/{id}`
+- `douyin.com/shipin/{id}`
+- `v.douyin.com/{code}`
+
+### 可用示例
+
+- `https://v.douyin.com/f-QpBB_oD9Y/`
+- `https://www.douyin.com/video/7641191614632071546`
+- `https://www.douyin.com/note/7643104807914401929`
+- `https://www.douyin.com/shipin/7643609848361355302`
+
+## 该平台响应会返回什么
+
+响应可能包含映射后的视频画质、音频、封面和笔记图片；受支持的媒体直链不会进行不必要的作品查询。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | 抖音（Douyin）的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.aweme_id` | `string` | 目标作品在平台中的公开标识，请按字符串保存以避免大整数精度丢失。 |
+| `data.platformData.desc` | `string` | 目标作品公开展示的标题、正文或说明文字。 |
+| `data.platformData.author` | `object` | 目标作品作者的公开资料字段，不包含联系方式或鉴权信息。 |
+| `data.platformData.video` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.images` | `array` | 目标作品的图片、封面或图集项目；数组顺序与平台返回顺序一致。 |
+| `data.platformData.music` | `object` | 目标作品的公开配乐、原声或独立音轨信息。 |
+| `data.platformData.statistics` | `object` | 平台公开展示的播放、点赞、评论、收藏或分享等互动统计。 |
+| `data.platformData.media_url` | `string` | 平台公开返回的媒体、封面或作品详情地址。 |
+| `data.platformData.media_type` | `string` | 平台公开返回的播放状态、格式或补充元数据。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "douyin",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "aweme_id": "7641191614632071546",
+      "desc": "Example public Douyin work",
+      "author": {
+        "uid": "creator-id",
+        "nickname": "Example creator"
+      },
+      "video": {
+        "width": 1080,
+        "height": 1920,
+        "duration": 15000,
+        "play_addr": {
+          "url_list": [
+            "https://media.example/video.mp4"
+          ]
+        }
+      },
+      "music": {
+        "title": "Original audio"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+后端代理携带抖音 Referer、浏览器 User-Agent 并透传 Range。抖音媒体签名有效期较短，也可能要求可公开访问的服务器地区。
+
+## 限制与行为
+
+不支持不含作品 ID 的主页、搜索结果、关注页、合集、直播、私密内容、已删除作品和地区不可用媒体。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- v.douyin.com 分享链接解析后再保存标准作品 URL。
+- 大视频响应需要透传 Range。
+- 签名 URL 返回 403 或 404 后立即重新解析。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/douyin/parse" />

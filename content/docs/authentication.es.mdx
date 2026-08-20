@@ -1,0 +1,17 @@
+---
+title: "Autenticación de la API"
+description: "Autentica la API de descarga de EasyDown con un token Bearer y protege las credenciales de producción."
+---
+
+Envía el token en la cabecera Authorization. No guardes tokens de producción en URL, registros del cliente, control de código ni eventos de analítica.
+
+```http
+Authorization: Bearer ed_live_your_token
+```
+
+## Límites y comportamiento
+
+- Los tokens se pueden limitar a plataformas concretas.
+- Un token ausente, caducado, revocado o inválido devuelve un error de autenticación y no consume créditos.
+- Sin permiso para la plataforma se devuelve `platform_not_allowed` y no se consumen créditos.
+- Las solicitudes del navegador admiten CORS, pero los tokens de producción deben permanecer normalmente en el servidor.

@@ -1,0 +1,846 @@
+{
+  "status": 200,
+  "data": {
+    "commonEndpoint": "/api/v1/parse",
+    "platformEndpoint": "/api/v1/platforms/{platform}/parse",
+    "billing": {
+      "creditsPerSuccessfulParse": 1,
+      "failedRequestsCharged": false
+    },
+    "platforms": [
+      {
+        "id": "tiktok",
+        "name": "TikTok",
+        "dataVersion": "1",
+        "linkFormats": [
+          "tiktok.com/@{user}/video/{id}",
+          "tiktok.com/@{user}/photo/{id}",
+          "tiktok.com/t/{code}"
+        ],
+        "examples": [
+          "https://www.tiktok.com/@jesscreatescontent/video/7647557116596718861",
+          "https://www.tiktok.com/@creator/photo/7512345678901234567",
+          "https://www.tiktok.com/t/ZP8pT81pD/"
+        ],
+        "dataContract": {
+          "description": "The final TikTok post object selected for the requested video or photo post.",
+          "fields": {
+            "aweme_id": {
+              "type": "string",
+              "description": "TikTok post identifier."
+            },
+            "desc": {
+              "type": "string",
+              "description": "Public post caption."
+            },
+            "author": {
+              "type": "object",
+              "description": "Public creator profile fields."
+            },
+            "video": {
+              "type": "object",
+              "description": "Video metadata and playable renditions when the post is a video."
+            },
+            "images": {
+              "type": "array",
+              "description": "Photo-post image objects when the post contains images."
+            },
+            "statistics": {
+              "type": "object",
+              "description": "Public engagement counters exposed for the post."
+            }
+          },
+          "example": {
+            "aweme_id": "7647557116596718861",
+            "desc": "Example public TikTok post",
+            "author": {
+              "unique_id": "creator",
+              "nickname": "Example creator"
+            },
+            "video": {
+              "width": 1080,
+              "height": 1920,
+              "duration": 12,
+              "play_addr": {
+                "url_list": [
+                  "https://media.example/video.mp4"
+                ]
+              }
+            },
+            "statistics": {
+              "play_count": 1200,
+              "digg_count": 84
+            }
+          }
+        }
+      },
+      {
+        "id": "douyin",
+        "name": "Douyin",
+        "dataVersion": "1",
+        "linkFormats": [
+          "douyin.com/video/{id}",
+          "douyin.com/note/{id}",
+          "douyin.com/shipin/{id}",
+          "v.douyin.com/{code}"
+        ],
+        "examples": [
+          "https://v.douyin.com/f-QpBB_oD9Y/",
+          "https://www.douyin.com/video/7641191614632071546",
+          "https://www.douyin.com/note/7643104807914401929",
+          "https://www.douyin.com/shipin/7643609848361355302",
+          "https://www.douyin.com/aweme/v1/play/?video_id=v0200fg10000d8bc95nog65vplh7mde0&line=0",
+          "https://aweme.snssdk.com/aweme/v1/play/?line=0&logo_name=aweme_diversion_search&ratio=720p&video_id=v0200fg10000d8m23dnog65ph2rj4200",
+          "https://so.douyin.com/video/detail?aweme_id=7642916558104300826",
+          "https://www.douyin.com/user/MS4wLjABAAAA4FOalUJJLsq4VnQ33Fiy3cvKR1sObM8R8LXaCJdiuh7s24dohsKlrMznjXOpx3h4?vid=7651545131359600314"
+        ],
+        "dataContract": {
+          "description": "The final Douyin aweme object, or a compact direct-media object for an accepted CDN URL.",
+          "fields": {
+            "aweme_id": {
+              "type": "string",
+              "description": "Douyin work identifier."
+            },
+            "desc": {
+              "type": "string",
+              "description": "Public work caption."
+            },
+            "author": {
+              "type": "object",
+              "description": "Public creator profile fields."
+            },
+            "video": {
+              "type": "object",
+              "description": "Video metadata and playable renditions."
+            },
+            "images": {
+              "type": "array",
+              "description": "Image-note items when the work is a gallery."
+            },
+            "music": {
+              "type": "object",
+              "description": "Public soundtrack metadata and playable audio fields."
+            },
+            "statistics": {
+              "type": "object",
+              "description": "Public engagement counters exposed for the work."
+            },
+            "media_url": {
+              "type": "string",
+              "description": "Accepted direct media URL when direct-media parsing is used."
+            },
+            "media_type": {
+              "type": "string",
+              "description": "Direct-media response kind when direct-media parsing is used."
+            }
+          },
+          "example": {
+            "aweme_id": "7641191614632071546",
+            "desc": "Example public Douyin work",
+            "author": {
+              "uid": "creator-id",
+              "nickname": "Example creator"
+            },
+            "video": {
+              "width": 1080,
+              "height": 1920,
+              "duration": 15000,
+              "play_addr": {
+                "url_list": [
+                  "https://media.example/video.mp4"
+                ]
+              }
+            },
+            "music": {
+              "title": "Original audio"
+            }
+          }
+        }
+      },
+      {
+        "id": "toutiao",
+        "name": "Toutiao",
+        "dataVersion": "1",
+        "linkFormats": [
+          "toutiao.com/video/{id}"
+        ],
+        "examples": [
+          "https://www.toutiao.com/video/7613611314560369152/",
+          "https://www.toutiao.com/video/7501991960077500979/"
+        ],
+        "dataContract": {
+          "description": "The final Toutiao single-video work object selected from the app response.",
+          "fields": {
+            "group_id": {
+              "type": "string",
+              "description": "Toutiao content group identifier when present."
+            },
+            "item_id": {
+              "type": "string",
+              "description": "Toutiao item identifier when present."
+            },
+            "title": {
+              "type": "string",
+              "description": "Public video title."
+            },
+            "abstract": {
+              "type": "string",
+              "description": "Public content summary."
+            },
+            "poster_url": {
+              "type": "string",
+              "description": "Poster image URL."
+            },
+            "video_duration": {
+              "type": "number",
+              "description": "Video duration reported by Toutiao."
+            },
+            "video_play_info": {
+              "type": "object",
+              "description": "Play information object; older responses can expose the same data as a JSON string."
+            }
+          },
+          "example": {
+            "group_id": "7613611314560369152",
+            "item_id": "7613611314560369152",
+            "title": "Example public Toutiao video",
+            "poster_url": "https://media.example/poster.jpg",
+            "video_duration": 18,
+            "video_play_info": {
+              "video_list": {
+                "video_1": {
+                  "main_url": "https://media.example/video.mp4"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "youtube",
+        "name": "YouTube",
+        "dataVersion": "1",
+        "linkFormats": [
+          "youtube.com/watch?v={id}",
+          "youtube.com/shorts/{id}",
+          "youtube.com/live/{id}",
+          "youtu.be/{id}"
+        ],
+        "examples": [
+          "https://www.youtube.com/watch?v=BiBY6TeIvJ4",
+          "https://youtu.be/MEoxtFRfPoc",
+          "https://www.youtube.com/shorts/xzOtM0x3_LU"
+        ],
+        "dataContract": {
+          "description": "The final YouTube player object for the requested video, Short, or replay.",
+          "fields": {
+            "videoDetails": {
+              "type": "object",
+              "description": "Title, duration, channel, thumbnails, and public video metadata."
+            },
+            "streamingData": {
+              "type": "object",
+              "description": "Progressive and adaptive audio/video renditions."
+            },
+            "playabilityStatus": {
+              "type": "object",
+              "description": "Public playback availability state."
+            },
+            "microformat": {
+              "type": "object",
+              "description": "Public page and embed metadata when available."
+            },
+            "captions": {
+              "type": "object",
+              "description": "Caption track metadata when exposed."
+            }
+          },
+          "example": {
+            "videoDetails": {
+              "videoId": "BiBY6TeIvJ4",
+              "title": "Example public YouTube video",
+              "lengthSeconds": "42",
+              "channelId": "channel-id"
+            },
+            "streamingData": {
+              "formats": [
+                {
+                  "itag": 18,
+                  "mimeType": "video/mp4",
+                  "qualityLabel": "360p",
+                  "url": "https://media.example/video.mp4"
+                }
+              ],
+              "adaptiveFormats": [
+                {
+                  "itag": 140,
+                  "mimeType": "audio/mp4",
+                  "bitrate": 128000,
+                  "url": "https://media.example/audio.m4a"
+                }
+              ]
+            },
+            "playabilityStatus": {
+              "status": "OK"
+            }
+          }
+        }
+      },
+      {
+        "id": "twitter",
+        "name": "Twitter / X",
+        "dataVersion": "1",
+        "linkFormats": [
+          "x.com/{user}/status/{id}",
+          "twitter.com/{user}/status/{id}"
+        ],
+        "examples": [
+          "https://x.com/i/status/2064933214720803143",
+          "https://x.com/Taozhishuishui/status/2041638397358260556/video/1"
+        ],
+        "dataContract": {
+          "description": "The final public Twitter/X status object and its media variants.",
+          "fields": {
+            "id_str": {
+              "type": "string",
+              "description": "Tweet or post identifier."
+            },
+            "text": {
+              "type": "string",
+              "description": "Public post text when exposed."
+            },
+            "full_text": {
+              "type": "string",
+              "description": "Expanded public post text when exposed."
+            },
+            "user": {
+              "type": "object",
+              "description": "Public author profile fields."
+            },
+            "media": {
+              "type": "object",
+              "description": "Video variants and image objects attached to the post."
+            },
+            "metrics": {
+              "type": "object",
+              "description": "Public engagement counters when exposed."
+            }
+          },
+          "example": {
+            "id_str": "2064933214720803143",
+            "full_text": "Example public X post",
+            "user": {
+              "screen_name": "creator",
+              "name": "Example creator"
+            },
+            "media": {
+              "video": [
+                {
+                  "variants": [
+                    {
+                      "content_type": "video/mp4",
+                      "bitrate": 832000,
+                      "url": "https://media.example/video.mp4"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "instagram",
+        "name": "Instagram",
+        "dataVersion": "1",
+        "linkFormats": [
+          "instagram.com/reel/{id}",
+          "instagram.com/p/{id}",
+          "instagram.com/stories/{user}/{id}",
+          "instagram.com/share/{type}/{code}"
+        ],
+        "examples": [
+          "https://www.instagram.com/reel/DY2PcmxiBE2/",
+          "https://www.instagram.com/p/DYJIhddkzi0/",
+          "https://www.instagram.com/stories/wordongreene/3940061275140997661",
+          "https://www.instagram.com/share/reel/BAabcdef123/"
+        ],
+        "dataContract": {
+          "description": "The final Instagram post, Reel, carousel, or requested active Story item.",
+          "fields": {
+            "id": {
+              "type": "string",
+              "description": "Instagram media identifier."
+            },
+            "code": {
+              "type": "string",
+              "description": "Public post or Reel shortcode."
+            },
+            "caption": {
+              "type": "object",
+              "description": "Public caption fields when available."
+            },
+            "user": {
+              "type": "object",
+              "description": "Public author profile fields."
+            },
+            "video_versions": {
+              "type": "array",
+              "description": "Playable video renditions for a video item."
+            },
+            "image_versions": {
+              "type": "object",
+              "description": "Image candidates for a photo or cover."
+            },
+            "carousel_media": {
+              "type": "array",
+              "description": "All media items in a public carousel."
+            },
+            "taken_at": {
+              "type": "number",
+              "description": "Publication timestamp when exposed."
+            }
+          },
+          "example": {
+            "id": "example-media-id",
+            "code": "DY2PcmxiBE2",
+            "caption": {
+              "text": "Example public Instagram post"
+            },
+            "user": {
+              "username": "creator",
+              "full_name": "Example creator"
+            },
+            "video_versions": [
+              {
+                "width": 1080,
+                "height": 1920,
+                "url": "https://media.example/video.mp4"
+              }
+            ],
+            "image_versions": {
+              "candidates": [
+                {
+                  "width": 1080,
+                  "height": 1920,
+                  "url": "https://media.example/cover.jpg"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "threads",
+        "name": "Threads",
+        "dataVersion": "1",
+        "linkFormats": [
+          "threads.com/@{user}/post/{id}",
+          "threads.net/@{user}/post/{id}",
+          "threads.com/@{user}/post/{id}/media",
+          "threads.net/@{user}/post/{id}/media",
+          "threads.com/share/{code}",
+          "threads.net/share/{code}",
+          "Supported post and share links may include query parameters"
+        ],
+        "examples": [
+          "https://www.threads.com/@eekeai/post/DDhV3LWhrlk",
+          "https://www.threads.com/share/_5O7Rn7A0/"
+        ],
+        "dataContract": {
+          "description": "Only the Threads post object matching the requested URL, excluding related or recommended posts.",
+          "fields": {
+            "id": {
+              "type": "string",
+              "description": "Threads post identifier."
+            },
+            "code": {
+              "type": "string",
+              "description": "Public post shortcode."
+            },
+            "text": {
+              "type": "string",
+              "description": "Public post text when exposed."
+            },
+            "user": {
+              "type": "object",
+              "description": "Public author profile fields."
+            },
+            "images": {
+              "type": "array",
+              "description": "Image items attached to the target post."
+            },
+            "image_versions2": {
+              "type": "object",
+              "description": "Image and cover candidates attached directly to the target post."
+            },
+            "video_versions": {
+              "type": "array",
+              "description": "Playable video renditions attached to the target post."
+            },
+            "carousel_media": {
+              "type": "array",
+              "description": "All media items in a carousel post."
+            },
+            "text_post_app_info": {
+              "type": "object",
+              "description": "Threads text-post metadata, including linked_inline_media when the post embeds downloadable media."
+            }
+          },
+          "example": {
+            "id": "example-thread-id",
+            "code": "DDhV3LWhrlk",
+            "text": "Example public Threads post",
+            "user": {
+              "username": "creator"
+            },
+            "image_versions2": {
+              "candidates": []
+            },
+            "video_versions": [],
+            "text_post_app_info": {
+              "linked_inline_media": {
+                "code": "DaOF2fAtXRh",
+                "image_versions2": {
+                  "candidates": [
+                    {
+                      "url": "https://media.example/cover.jpg",
+                      "width": 540,
+                      "height": 960
+                    }
+                  ]
+                },
+                "video_versions": [
+                  {
+                    "type": 101,
+                    "url": "https://media.example/video.mp4"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "xiaohongshu",
+        "name": "Xiaohongshu / RedNote",
+        "dataVersion": "1",
+        "linkFormats": [
+          "xiaohongshu.com/explore/{id}",
+          "xiaohongshu.com/discovery/item/{id}",
+          "rednote.com/explore/{id}",
+          "xhslink.com/{path}",
+          "xhslink.cn/{path}"
+        ],
+        "examples": [
+          "https://www.xiaohongshu.com/discovery/item/67f75b07000000000b0154b3",
+          "https://www.xiaohongshu.com/explore/671e2c6500000000210016b9",
+          "https://www.rednote.com/explore/6a51ee42000000001702879f",
+          "http://xhslink.com/o/2CxGwu8nSPx",
+          "https://xhslink.cn/o/5NAyjFxd4fi"
+        ],
+        "dataContract": {
+          "description": "The final Xiaohongshu/RedNote note object selected for the requested note identifier.",
+          "fields": {
+            "note_id": {
+              "type": "string",
+              "description": "Xiaohongshu note identifier."
+            },
+            "title": {
+              "type": "string",
+              "description": "Public note title."
+            },
+            "desc": {
+              "type": "string",
+              "description": "Public note description."
+            },
+            "type": {
+              "type": "string",
+              "description": "Note media type."
+            },
+            "user": {
+              "type": "object",
+              "description": "Public author profile fields."
+            },
+            "images_list": {
+              "type": "array",
+              "description": "All image and live-photo items in the note."
+            },
+            "video_info_v2": {
+              "type": "object",
+              "description": "Video stream, codec, cover, and dimension metadata."
+            },
+            "interact_info": {
+              "type": "object",
+              "description": "Public engagement counters."
+            },
+            "native_voice_info": {
+              "type": "object",
+              "description": "Native voice track metadata when present."
+            }
+          },
+          "example": {
+            "note_id": "67f75b07000000000b0154b3",
+            "title": "Example public RedNote post",
+            "desc": "Example note description",
+            "type": "video",
+            "user": {
+              "user_id": "creator-id",
+              "nickname": "Example creator"
+            },
+            "images_list": [
+              {
+                "width": 1080,
+                "height": 1440,
+                "url": "https://media.example/image.jpg"
+              }
+            ],
+            "interact_info": {
+              "liked_count": "120",
+              "collected_count": "24"
+            }
+          }
+        }
+      },
+      {
+        "id": "bilibili",
+        "name": "Bilibili",
+        "dataVersion": "1",
+        "linkFormats": [
+          "bilibili.com/video/BV{id}",
+          "bilibili.com/video/av{id}",
+          "b23.tv/{code}",
+          "bilibili.com/bangumi/play/{id}",
+          "bilibili.com/cheese/play/{id}"
+        ],
+        "examples": [
+          "https://www.bilibili.com/video/BV1sW4y197cE/",
+          "https://www.bilibili.com/video/av45306969/",
+          "https://b23.tv/INJgdai"
+        ],
+        "dataContract": {
+          "description": "The final mainland Bilibili play object for the requested BV, av, bangumi, cheese, or supported list item.",
+          "fields": {
+            "title": {
+              "type": "string",
+              "description": "Public video title."
+            },
+            "pic": {
+              "type": "string",
+              "description": "Public cover image URL."
+            },
+            "timelength": {
+              "type": "number",
+              "description": "Duration in milliseconds."
+            },
+            "dash": {
+              "type": "object",
+              "description": "Separate DASH video and audio renditions."
+            },
+            "support_formats": {
+              "type": "array",
+              "description": "Quality labels and supported playback formats."
+            },
+            "quality": {
+              "type": "number",
+              "description": "Selected quality identifier when exposed."
+            },
+            "format": {
+              "type": "string",
+              "description": "Selected playback format when exposed."
+            }
+          },
+          "example": {
+            "title": "Example public Bilibili video",
+            "pic": "https://media.example/cover.jpg",
+            "timelength": 65000,
+            "dash": {
+              "video": [
+                {
+                  "id": 80,
+                  "width": 1920,
+                  "height": 1080,
+                  "mimeType": "video/mp4",
+                  "baseUrl": "https://media.example/video.m4s"
+                }
+              ],
+              "audio": [
+                {
+                  "id": 30280,
+                  "bandwidth": 128000,
+                  "mimeType": "audio/mp4",
+                  "baseUrl": "https://media.example/audio.m4s"
+                }
+              ]
+            },
+            "support_formats": [
+              {
+                "quality": 80,
+                "new_description": "1080P"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "kuaishou",
+        "name": "Kuaishou / Kwai",
+        "dataVersion": "1",
+        "linkFormats": [
+          "kuaishou.com/short-video/{id}",
+          "v.kuaishou.com/{code}",
+          "kwai.com/@{user}/video/{id}"
+        ],
+        "examples": [
+          "https://v.kuaishou.com/JuuRuozy",
+          "https://www.kuaishou.com/short-video/3x2cvn2u7fq8k8s",
+          "https://www.kwai.com/@volana390/video/5207718655495282041"
+        ],
+        "dataContract": {
+          "description": "The final Kuaishou/Kwai photo object selected by the requested photo identifier.",
+          "fields": {
+            "photoId": {
+              "type": "string",
+              "description": "Kuaishou or Kwai photo identifier."
+            },
+            "caption": {
+              "type": "string",
+              "description": "Public post caption."
+            },
+            "author": {
+              "type": "object",
+              "description": "Public creator profile fields."
+            },
+            "mainMvUrls": {
+              "type": "array",
+              "description": "Direct playable video renditions."
+            },
+            "manifest": {
+              "type": "object",
+              "description": "Adaptive stream metadata when exposed."
+            },
+            "coverUrls": {
+              "type": "array",
+              "description": "Public cover image candidates."
+            },
+            "duration": {
+              "type": "number",
+              "description": "Video duration reported by the platform."
+            },
+            "width": {
+              "type": "number",
+              "description": "Source video width."
+            },
+            "height": {
+              "type": "number",
+              "description": "Source video height."
+            }
+          },
+          "example": {
+            "photoId": "3x2cvn2u7fq8k8s",
+            "caption": "Example public Kuaishou video",
+            "author": {
+              "name": "Example creator"
+            },
+            "mainMvUrls": [
+              {
+                "quality": "720p",
+                "url": "https://media.example/video.mp4"
+              }
+            ],
+            "coverUrls": [
+              {
+                "url": "https://media.example/cover.jpg"
+              }
+            ],
+            "duration": 12000,
+            "width": 720,
+            "height": 1280
+          }
+        }
+      },
+      {
+        "id": "weibo",
+        "name": "Weibo",
+        "dataVersion": "1",
+        "linkFormats": [
+          "weibo.com/{user}/{id}",
+          "m.weibo.cn/status/{id}",
+          "m.weibo.cn/detail/{id}",
+          "weibo.com/tv/show/{id}",
+          "video.weibo.com/show?fid={id}",
+          "t.cn/{code}"
+        ],
+        "examples": [
+          "https://m.weibo.cn/status/5052484659707960",
+          "https://m.weibo.cn/detail/5320188317925845",
+          "https://weibo.com/1735344023/KlxqqfkYa",
+          "https://weibo.com/tv/show/1034:5302868002144396",
+          "https://h5.video.weibo.com/show/1034:5312050914590738",
+          "https://video.weibo.com/show?fid=1034:d2dfc400feed6790c7bf8bda90ae610b",
+          "https://weibo.com/1234567890?tabtype=newVideo&layerid=5328109110823893",
+          "https://weibo.com/u/5698023579?tabtype=newVideo&layerid=5327436065542153"
+        ],
+        "dataContract": {
+          "description": "The final Weibo status or video play object selected for the requested post.",
+          "fields": {
+            "id": {
+              "type": "string",
+              "description": "Weibo status identifier."
+            },
+            "mid": {
+              "type": "string",
+              "description": "Weibo numeric message identifier when exposed."
+            },
+            "mblogid": {
+              "type": "string",
+              "description": "Public short message identifier when exposed."
+            },
+            "text_raw": {
+              "type": "string",
+              "description": "Public plain-text post content."
+            },
+            "user": {
+              "type": "object",
+              "description": "Public author profile fields."
+            },
+            "pics": {
+              "type": "array",
+              "description": "All public image items attached to the post."
+            },
+            "page_info": {
+              "type": "object",
+              "description": "Video page title, cover, and media information."
+            },
+            "video_details_url": {
+              "type": "string",
+              "description": "Public video detail URL when exposed."
+            }
+          },
+          "example": {
+            "id": "5320188317925845",
+            "mid": "5320188317925845",
+            "text_raw": "Example public Weibo post",
+            "user": {
+              "screen_name": "Example creator"
+            },
+            "pics": [
+              {
+                "large": {
+                  "url": "https://media.example/image.jpg"
+                }
+              }
+            ],
+            "page_info": {
+              "page_title": "Example video",
+              "media_info": {
+                "mp4_hd_url": "https://media.example/video.mp4"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "msg": "success"
+}

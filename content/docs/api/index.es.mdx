@@ -1,0 +1,31 @@
+---
+title: "API para descargar videos por plataforma"
+description: "Compara las 11 API de descarga por plataforma de EasyDown, sus URL compatibles, archivos disponibles, datos públicos completos y esquemas de petición."
+---
+
+Elige una API específica cuando necesites tanto el modelo multimedia estable de EasyDown como los datos públicos completos y depurados de la publicación solicitada.
+
+<Cards>
+  <Card title="API de descarga de videos de TikTok" href="/es/api/tiktok" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="API de descarga de videos de Douyin" href="/es/api/douyin" description="`images[]`, `videos[]`, `audios[]`" />
+  <Card title="API de descarga de videos de Toutiao" href="/es/api/toutiao" description="`images[]`, `videos[]`" />
+  <Card title="API de descarga de videos de YouTube" href="/es/api/youtube" description="`videos[]`, `audios[]`" />
+  <Card title="API de descarga de videos de Twitter / X" href="/es/api/twitter" description="`images[]`, `videos[]`" />
+  <Card title="API de descarga de videos de Instagram" href="/es/api/instagram" description="`images[]`, `videos[]`" />
+  <Card title="API de descarga de videos de Threads" href="/es/api/threads" description="`images[]`, `videos[]`" />
+  <Card title="API de descarga de videos de Xiaohongshu / RedNote" href="/es/api/xiaohongshu" description="`images[]`, `videos[]`" />
+  <Card title="API de descarga de videos de Bilibili" href="/es/api/bilibili" description="`videos[]`, `audios[]`" />
+  <Card title="API de descarga de videos de Kuaishou / Kwai" href="/es/api/kuaishou" description="`videos[]`" />
+  <Card title="API de descarga de videos de Weibo" href="/es/api/weibo" description="`images[]`, `videos[]`" />
+</Cards>
+
+## Elige el tipo de respuesta
+
+| API | Úsala cuando |
+|---|---|
+| [`POST /api/v1/parse`](/es/api/common) | Necesitas un modelo multimedia estable para todas las plataformas compatibles. |
+| `POST /api/v1/platforms/{platform}/parse` | Necesitas medios normalizados y el objeto completo de la plataforma, sin campos sensibles. |
+
+## Créditos y facturación de la API
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.

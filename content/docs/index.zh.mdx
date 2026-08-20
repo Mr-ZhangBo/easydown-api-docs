@@ -1,0 +1,51 @@
+---
+title: "社交媒体视频下载 API"
+description: "面向开发者的多平台视频解析与下载 API 文档，支持 TikTok、YouTube、Instagram、X、小红书、Bilibili、抖音、Threads、快手、微博和今日头条。"
+---
+
+通过一套社交媒体视频下载 API 对接 11 个平台。通用接口返回统一的视频、图片和音频结构，平台专用接口还会返回经过安全清理的平台全量数据。
+
+<Cards>
+  <Card title="视频下载 API 快速开始" href="/zh/quick-start" description="POST /api/v1/parse" />
+  <Card title="支持的视频链接格式" href="/zh/supported-links" description="11 个平台及 URL 形态" />
+  <Card title="通用社交媒体视频下载 API" href="/zh/api/common" description="一套统一媒体响应" />
+  <Card title="各平台视频下载 API" href="/zh/api" description="媒体与平台全量数据" />
+</Cards>
+
+## 选择合适的响应结构
+
+| 接口 | 适用场景 |
+|---|---|
+| [`POST /api/v1/parse`](/zh/api/common) | 需要用一套稳定媒体结构处理所有已支持平台。 |
+| `POST /api/v1/platforms/{platform}/parse` | 除了统一媒体结构，还需要目标作品经过清理的平台全量数据。 |
+
+## 已支持平台
+
+每个平台页面都包含已支持链接、全量响应、平台限制、错误处理和实时请求模式。
+
+- [TikTok 视频下载 API](/zh/api/tiktok)
+- [抖音视频下载 API](/zh/api/douyin)
+- [今日头条视频下载 API](/zh/api/toutiao)
+- [YouTube 视频下载 API](/zh/api/youtube)
+- [Twitter / X 视频下载 API](/zh/api/twitter)
+- [Instagram 视频与图片下载 API](/zh/api/instagram)
+- [Threads 视频与图片下载 API](/zh/api/threads)
+- [小红书 / RedNote 视频与图片下载 API](/zh/api/xiaohongshu)
+- [Bilibili / B站视频下载 API](/zh/api/bilibili)
+- [快手 / Kwai 视频下载 API](/zh/api/kuaishou)
+- [微博视频与图片下载 API](/zh/api/weibo)
+
+## 可下载媒体
+
+成功响应可以包含视频、图片或音频。即使上游平台字段变化，统一媒体结构也能让客户端代码保持稳定。
+
+## 接口地址
+
+- `POST https://api.easydown.org/api/v1/parse`
+- `POST https://api.easydown.org/api/v1/platforms/{platform}/parse`
+- `GET https://api.easydown.org/api/v1/capabilities`
+- `GET https://api.easydown.org/openapi.json`
+
+## API 计费与额度
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。

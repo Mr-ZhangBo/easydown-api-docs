@@ -1,0 +1,25 @@
+---
+title: "動画ダウンロードAPIのエラーコード"
+description: "未対応URL、利用不可コンテンツ、メディアなし、プラットフォーム不一致、外部サービス障害の安定したエラーコードを扱います。"
+---
+
+| 項目 | 説明 |
+|---|---|
+| `platform_mismatch` | URLが別のプラットフォームに属します |
+| `unsupported_url` | URL形式が未対応です |
+| `content_unavailable` | 投稿が非公開、削除、制限、利用不可です |
+| `no_media` | ダウンロード可能なメディアがありません |
+| `upstream_unavailable` | プラットフォームサービスが一時的に利用できません |
+
+## レスポンス
+
+```json
+{
+  "status": 404,
+  "data": null,
+  "msg": "The content is unavailable",
+  "code": "content_unavailable"
+}
+```
+
+EasyDownはプロバイダー名、リクエストID、内部エンドポイント、課金情報、認証情報、トレース、外部サービスの生エラー文を返しません。

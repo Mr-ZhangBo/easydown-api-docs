@@ -1,0 +1,134 @@
+---
+title: "API de descarga de videos de Toutiao"
+description: "Usa la API de Toutiao con URL públicas compatibles y recibe videos, imágenes, audio y datos completos sin campos sensibles."
+---
+
+Envía una URL pública `/video/{id}` de Toutiao. La API mantiene el group ID como texto para evitar pérdida de precisión y devuelve flujos principales y alternativos.
+
+Úsala cuando una aplicación necesite descargar videos de Toutiao desde artículos y URL de video compatibles.
+
+Usa este endpoint cuando necesites campos propios de la plataforma además de medios descargables estables.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/toutiao/parse`
+
+## Formatos de URL compatibles
+
+- `toutiao.com/video/{id}`
+
+### Ejemplos aceptados
+
+- `https://www.toutiao.com/video/7613611314560369152/`
+- `https://www.toutiao.com/video/7501991960077500979/`
+
+## Contenido de la respuesta de la plataforma
+
+Puede devolver flujos de video principales y alternativos, primera imagen, portada y miniaturas del contenido.
+
+## Campos publicados de la plataforma
+
+La API conserva otros campos públicos del objeto final después de eliminar de forma recursiva los datos sensibles. Los campos documentados se mantienen estables durante esta versión de platformData.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `data.media` | `object` | Imágenes, videos, audios, título, miniatura y duración normalizados. |
+| `data.platformDataVersion` | `string` | Versión pública del contrato de datos de Toutiao; actualmente `1`. |
+| `data.platformData.group_id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.item_id` | `string` | Identificador público del contenido. Guárdalo como texto para evitar pérdidas de precisión con números grandes. |
+| `data.platformData.title` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.abstract` | `string` | Título, texto o descripción que se muestra públicamente en la publicación solicitada. |
+| `data.platformData.poster_url` | `string` | URL pública de un archivo, portada o página de detalle devuelta por la plataforma. |
+| `data.platformData.video_duration` | `number` | Duración, dimensiones, calidad u otros parámetros técnicos publicados por la plataforma. |
+| `data.platformData.video_play_info` | `object` | Datos de reproducción, calidad, códec, dimensiones y URL multimedia del video solicitado. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "toutiao",
+      "title": "Ejemplo de publicación pública",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "group_id": "7613611314560369152",
+      "item_id": "7613611314560369152",
+      "title": "Example public Toutiao video",
+      "poster_url": "https://media.example/poster.jpg",
+      "video_duration": 18,
+      "video_play_info": {
+        "video_list": {
+          "video_1": {
+            "main_url": "https://media.example/video.mp4"
+          }
+        }
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Descarga y uso de proxy
+
+Descarga desde el backend con Referer de Toutiao, User-Agent y Range. Transmite la URL principal o alternativa y vuelve a analizar cuando caduque.
+
+## Límites y comportamiento
+
+No admite artículos, páginas group, perfiles, búsquedas, canales, enlaces cortos, directos ni URLs sin un único ID de video.
+
+Solo se admite contenido público. El contenido privado, eliminado, restringido por edad o región, en directo o no disponible puede fallar sin consumir créditos.
+
+Solo se cobra después de devolver medios descargables: 1 crédito por análisis correcto. Los fallos de autenticación, validación, permisos, contenido, medios o servicio externo no se cobran.
+
+## Solución de problemas
+
+- Guarda el group ID como texto tanto en JavaScript como en la base de datos.
+- Prueba una URL alternativa si el flujo principal seleccionado no está disponible.
+- Envía una página `/video/{id}`, no una URL de artículo o de grupo.
+
+## Preguntas frecuentes
+
+### ¿Una solicitud fallida consume créditos?
+
+No. Solo se cobra 1 crédito cuando la API devuelve medios descargables.
+
+### ¿Por qué puede fallar una URL pública válida?
+
+La publicación puede estar eliminada, ser privada, tener restricciones regionales, ser un directo, no contener medios o sufrir una indisponibilidad externa.
+
+## Guías relacionadas
+
+- [Todas las API por plataforma](/es/api)
+- [API común normalizada](/es/api/common)
+- [Todos los formatos de URL](/es/supported-links)
+- [Códigos de error](/es/errors)
+- [Descarga de medios](/es/media-downloads)
+- [Autenticación](/es/authentication)
+- [Créditos y facturación](/es/billing)
+
+## Referencia interactiva de la API
+
+Los ejemplos en curl, JavaScript y Python, junto con los esquemas, se generan desde el contrato OpenAPI 3.1 de producción.
+
+El panel «Try it» envía solicitudes directamente a `api.easydown.org`. El token solo permanece en la memoria de la página y se elimina al recargar.
+
+<ApiReference path="/api/v1/platforms/toutiao/parse" />

@@ -1,0 +1,151 @@
+---
+title: "YouTube 视频下载 API"
+description: "使用 YouTube 视频下载 API 解析已支持的公开链接，返回视频、图片、音频和清理敏感字段后的平台全量数据。"
+---
+
+把一个公开 YouTube URL 发送到统一 REST Endpoint。接口会保留全部可用视频与音频候选，方便后端自行选择格式，而不是被限制为单个文件。
+
+适合增加 YouTube 视频下载能力，并让业务端继续使用统一媒体结构。
+
+当你既需要稳定的可下载媒体，又需要平台专属字段时，使用此接口。
+
+## 接口地址
+
+`POST https://api.easydown.org/api/v1/platforms/youtube/parse`
+
+## 支持的 URL 格式
+
+- `youtube.com/watch?v={id}`
+- `youtube.com/shorts/{id}`
+- `youtube.com/live/{id}`
+- `youtu.be/{id}`
+
+### 可用示例
+
+- `https://www.youtube.com/watch?v=BiBY6TeIvJ4`
+- `https://youtu.be/MEoxtFRfPoc`
+- `https://www.youtube.com/shorts/xzOtM0x3_LU`
+
+## 该平台响应会返回什么
+
+videos[] 可能同时包含渐进式文件和纯视频流，独立音频位于 audios[]。部分高画质 DASH 结果需要分别下载音视频后使用 FFmpeg 合并。
+
+## 已发布的平台数据字段
+
+接口会保留目标作品最终响应中的其他公开字段，并递归删除敏感字段。下表字段在当前 platformDataVersion 内保持稳定。
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `data.media` | `object` | 统一的图片、视频、音频、标题、封面和时长。 |
+| `data.platformDataVersion` | `string` | YouTube的公开数据契约版本，当前为 `1`。 |
+| `data.platformData.videoDetails` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.streamingData` | `object` | 目标作品的视频播放、清晰度、编码、尺寸和媒体地址信息。 |
+| `data.platformData.playabilityStatus` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.microformat` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+| `data.platformData.captions` | `object` | 平台公开返回的播放状态、格式或补充元数据。 |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "youtube",
+      "title": "公开作品示例",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "videoDetails": {
+        "videoId": "BiBY6TeIvJ4",
+        "title": "Example public YouTube video",
+        "lengthSeconds": "42",
+        "channelId": "channel-id"
+      },
+      "streamingData": {
+        "formats": [
+          {
+            "itag": 18,
+            "mimeType": "video/mp4",
+            "qualityLabel": "360p",
+            "url": "https://media.example/video.mp4"
+          }
+        ],
+        "adaptiveFormats": [
+          {
+            "itag": 140,
+            "mimeType": "audio/mp4",
+            "bitrate": 128000,
+            "url": "https://media.example/audio.m4a"
+          }
+        ]
+      },
+      "playabilityStatus": {
+        "status": "OK"
+      }
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## 下载与代理建议
+
+建议后端携带浏览器 User-Agent、YouTube Referer、Origin 并透传 Range 请求下载。部分流会绑定解析服务器 IP 或受地区限制。
+
+## 限制与行为
+
+不支持播放列表、频道页、社区帖子、私密视频、会员内容、DRM 内容和地区不可用视频。
+
+仅支持公开内容。私密、已删除、年龄限制、地区限制、直播或其他不可用内容可能解析失败，失败不消耗额度。
+
+只有返回可下载媒体后才扣费，每次成功解析消耗 1 个额度（credit）。鉴权、参数校验、权限、内容不可用、无媒体和上游故障均不扣费。
+
+## 故障排查
+
+- 所选画质没有声音时，下载独立音频并与视频合并。
+- 签名流过期或返回 403 时，重新解析原始 URL。
+- 地区受限的公开媒体需要使用可访问该内容的后端地区。
+
+## 常见问题
+
+### 失败请求会消耗额度吗？
+
+不会。只有 API 成功返回可下载媒体后才消耗 1 个额度。
+
+### 为什么有效的公开链接仍可能失败？
+
+作品可能已经删除、设为私密、存在地区限制、属于直播、没有可下载媒体，或上游服务暂时不可用。
+
+## 相关指南
+
+- [全部平台 API](/zh/api)
+- [通用统一媒体 API](/zh/api/common)
+- [全部支持的 URL 格式](/zh/supported-links)
+- [错误码](/zh/errors)
+- [下载媒体](/zh/media-downloads)
+- [API 鉴权](/zh/authentication)
+- [计费与额度](/zh/billing)
+
+## 交互式 API 参考
+
+下方 curl、JavaScript、Python 示例和接口模式定义均由生产 OpenAPI 3.1 契约生成。
+
+在线调试面板会直接请求 `api.easydown.org`。Token 只保存在当前页面内存中，刷新后立即清除。
+
+<ApiReference path="/api/v1/platforms/youtube/parse" />

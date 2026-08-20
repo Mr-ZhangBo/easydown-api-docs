@@ -1,0 +1,146 @@
+---
+title: "Kuaishou / Kwai Video Downloader API"
+description: "Use EasyDown's Kuaishou / Kwai video downloader API for supported public URLs. Return downloadable video, images, audio, and sanitized platform data."
+---
+
+Share links are resolved to a photo ID when possible, then normalized video, cover, dimension, and duration fields are returned without provider-specific response objects.
+
+Use it to add Kuaishou or Kwai video downloader support for compatible public post and short-link formats.
+
+Use this endpoint when you need platform-specific fields in addition to stable downloadable media.
+
+## Endpoints
+
+`POST https://api.easydown.org/api/v1/platforms/kuaishou/parse`
+
+## Supported URL formats
+
+- `kuaishou.com/short-video/{id}`
+- `v.kuaishou.com/{code}`
+- `kwai.com/@{user}/video/{id}`
+
+### Accepted examples
+
+- `https://v.kuaishou.com/JuuRuozy`
+- `https://www.kuaishou.com/short-video/3x2cvn2u7fq8k8s`
+- `https://www.kwai.com/@volana390/video/5207718655495282041`
+
+## What the platform response contains
+
+Every available public video URL and content cover is returned, with dimensions and duration when the source exposes them.
+
+## Published platform data fields
+
+The API preserves additional public fields from the final target object after recursive sensitive-field filtering. The documented fields below remain stable for this platformDataVersion.
+
+| Field | Type | Description |
+|---|---|---|
+| `data.media` | `object` | Normalized images, videos, audios, title, thumbnail, and duration. |
+| `data.platformDataVersion` | `string` | Published data contract version for Kuaishou / Kwai; currently `1`. |
+| `data.platformData.photoId` | `string` | Kuaishou or Kwai photo identifier. |
+| `data.platformData.caption` | `string` | Public post caption. |
+| `data.platformData.author` | `object` | Public creator profile fields. |
+| `data.platformData.mainMvUrls` | `array` | Direct playable video renditions. |
+| `data.platformData.manifest` | `object` | Adaptive stream metadata when exposed. |
+| `data.platformData.coverUrls` | `array` | Public cover image candidates. |
+| `data.platformData.duration` | `number` | Video duration reported by the platform. |
+| `data.platformData.width` | `number` | Source video width. |
+| `data.platformData.height` | `number` | Source video height. |
+
+
+```json
+{
+  "status": 200,
+  "data": {
+    "media": {
+      "platform": "kuaishou",
+      "title": "Example public post",
+      "thumbnail": "https://public-cdn.example/cover.jpg",
+      "duration": 18,
+      "images": [],
+      "videos": [
+        {
+          "url": "https://public-cdn.example/video.mp4",
+          "quality": "1080p",
+          "mimeType": "video/mp4",
+          "width": 1920,
+          "height": 1080,
+          "hasAudio": true,
+          "source": "direct"
+        }
+      ],
+      "audios": []
+    },
+    "platformData": {
+      "photoId": "3x2cvn2u7fq8k8s",
+      "caption": "Example public Kuaishou video",
+      "author": {
+        "name": "Example creator"
+      },
+      "mainMvUrls": [
+        {
+          "quality": "720p",
+          "url": "https://media.example/video.mp4"
+        }
+      ],
+      "coverUrls": [
+        {
+          "url": "https://media.example/cover.jpg"
+        }
+      ],
+      "duration": 12000,
+      "width": 720,
+      "height": 1280
+    },
+    "platformDataVersion": "1"
+  },
+  "msg": "success"
+}
+```
+
+
+## Download and proxy guidance
+
+Use Referer: https://www.kuaishou.com/, a browser User-Agent, and forwarded Range headers. Proxy large video files as streams rather than loading them fully into server memory.
+
+## Limits and behavior
+
+Profiles, live rooms, search pages, collections, private works, deleted works, expired share tokens, and region-unavailable videos are unsupported.
+
+Only public content is supported. Private, deleted, age-restricted, region-restricted, live, or otherwise unavailable content can fail without a credit charge.
+
+A response is charged only after downloadable media is returned. Each successful parse costs 1 credit. Authentication, validation, permission, unavailable-content, no-media, and upstream failures are not charged.
+
+## Troubleshooting
+
+- Submit the share text or full URL when a short token is used.
+- Stream large videos and forward Range for resume support.
+- Re-parse when a resolved photo URL expires.
+
+## Common questions
+
+### Does a failed request consume credits?
+
+No. A credit is charged only after the API returns downloadable media.
+
+### Why can a valid public link still fail?
+
+The post can be deleted, private, region-restricted, live, missing media, or temporarily unavailable upstream.
+
+## Related guides
+
+- [All platform APIs](/en/api)
+- [Common normalized API](/en/api/common)
+- [All supported URL formats](/en/supported-links)
+- [Error codes](/en/errors)
+- [Downloading media](/en/media-downloads)
+- [Authentication](/en/authentication)
+- [Credits and billing](/en/billing)
+
+## Interactive API reference
+
+The curl, JavaScript, and Python examples and schemas below are rendered from the production OpenAPI 3.1 contract.
+
+The Try it panel sends requests directly to api.easydown.org. Its token is held in React memory only and disappears on reload.
+
+<ApiReference path="/api/v1/platforms/kuaishou/parse" />
