@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const contentRoot = path.join(root, 'content', 'docs');
-const mapPath = path.join(root, 'docs', 'DOCUMENTATION.md');
+const mapPath = path.join(root, 'docs', 'index.md');
 const locales = ['en', 'zh', 'ja', 'es'];
 
 async function collectEnglishRoutes(directory, prefix = '') {

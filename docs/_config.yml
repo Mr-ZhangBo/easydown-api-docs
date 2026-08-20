@@ -1,0 +1,6 @@
+theme: jekyll-theme-cayman
+title: EasyDown API Documentation Map
+description: Browse every EasyDown API guide and endpoint reference in four languages.
+url: https://mr-zhangbo.github.io
+baseurl: /easydown-api-docs
+show_downloads: false

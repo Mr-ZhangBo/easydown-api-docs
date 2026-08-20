@@ -1,9 +1,18 @@
+---
+layout: default
+title: EasyDown API documentation map
+description: Direct links to every EasyDown API guide and endpoint reference in English, Simplified Chinese, Japanese, and Spanish.
+---
+
 # EasyDown API documentation map
 
 This index links directly to every published EasyDown API documentation page in
 English, Simplified Chinese, Japanese, and Spanish. Use it to find the correct
 guide, endpoint reference, or platform integration without navigating between
 locales manually.
+
+The source for this open documentation project is available on
+[GitHub](https://github.com/Mr-ZhangBo/easydown-api-docs).
 
 | Documentation page | English | 简体中文 | 日本語 | Español |
 |---|---|---|---|---|

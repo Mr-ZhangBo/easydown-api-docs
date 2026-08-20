@@ -18,9 +18,10 @@ Built with Next.js, Fumadocs, and Fumadocs OpenAPI.
 - [Supported video URL formats](https://docs.easydown.org/en/supported-links)
 - [OpenAPI reference](https://docs.easydown.org/en/api)
 - [MCP server guide](https://docs.easydown.org/en/mcp)
-- [Complete multilingual documentation map](docs/DOCUMENTATION.md) — direct
+- [Complete multilingual documentation map](docs/index.md) — direct
   links to all 84 published URLs across English, Simplified Chinese, Japanese,
   and Spanish
+- [Browsable GitHub Pages documentation map](https://mr-zhangbo.github.io/easydown-api-docs/)
 
 ## Features
 
