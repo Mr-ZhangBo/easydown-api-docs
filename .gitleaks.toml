@@ -1,8 +1,9 @@
 [extend]
 useDefault = true
 
-[[allowlists]]
+[allowlist]
 description = "Documented EasyDown API token placeholders"
+regexTarget = "line"
 regexes = [
-  '''ed_live_your_token''',
+  '''(?i)Authorization:\s*Bearer\s+ed_live_your_token''',
 ]

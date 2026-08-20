@@ -34,7 +34,7 @@ Built with Next.js, Fumadocs, and Fumadocs OpenAPI.
 
 ## Development
 
-Requirements: Node.js 20 or later and npm.
+Requirements: Node.js 22 or later and npm.
 
 ```bash
 npm ci

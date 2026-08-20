@@ -4,6 +4,9 @@
   "description": "Open-source multilingual documentation for the EasyDown social media video downloader API and MCP server.",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "homepage": "https://docs.easydown.org",
   "repository": {
     "type": "git",
