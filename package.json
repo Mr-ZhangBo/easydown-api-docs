@@ -40,7 +40,7 @@
   "dependencies": {
     "@fumadocs/language": "^0.2.2",
     "cnfast": "^0.1.0",
-    "fumadocs-core": "16.14.4",
+    "fumadocs-core": "16.15.1",
     "fumadocs-mdx": "15.2.3",
     "fumadocs-openapi": "^11.2.4",
     "fumadocs-ui": "npm:@fumadocs/base-ui@16.14.4",
