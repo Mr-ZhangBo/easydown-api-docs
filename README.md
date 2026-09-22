@@ -11,6 +11,8 @@ Weibo, and Toutiao.
 
 Built with Next.js, Fumadocs, and Fumadocs OpenAPI.
 
+GitLab mirror: [easydown-api-docs](https://gitlab.com/tools504402/easydown-api-docs)
+
 ## Documentation
 
 - [API quick start](https://docs.easydown.org/en/quick-start)
